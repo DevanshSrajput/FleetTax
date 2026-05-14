@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../models/vehicle.dart';
 import '../providers/vehicle_provider.dart';
+import '../services/notification_service.dart';
 import '../widgets/stats_bar.dart';
 import '../widgets/filter_chips.dart';
 import '../widgets/vehicle_card.dart';
@@ -31,10 +33,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Could not open Vahan website'),
+          const SnackBar(
+            content: Text('Could not open Vahan website'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFFBA1A1A),
+            backgroundColor: Color(0xFFFF0044),
           ),
         );
       }
@@ -42,65 +44,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showSortOptions() {
-    final theme = Theme.of(context);
+    const black = Color(0xFF000000);
     final provider = context.read<VehicleProvider>();
     showModalBottomSheet(
       context: context,
-      showDragHandle: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: black, width: 3)),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                'Sort By',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+            Container(
+              width: double.infinity,
+              color: const Color(0xFFFFD600),
+              padding: const EdgeInsets.all(12),
+              child: const Text(
+                'SORT BY',
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                  color: black,
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
+            const Divider(height: 0, thickness: 3, color: black),
             ListTile(
-              leading: const Icon(Icons.timer),
-              title: const Text('Expiry (Soonest First)'),
+              leading: const Icon(Icons.timer, color: black),
+              title: const Text('EXPIRY (SOONEST FIRST)', style: TextStyle(fontWeight: FontWeight.w800)),
               trailing: provider.sortBy == 'expiry'
-                  ? Icon(Icons.check, color: theme.colorScheme.primary)
+                  ? Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00D676),
+                        border: Border.all(color: black, width: 2),
+                      ),
+                      child: const Icon(Icons.check, color: black, size: 16),
+                    )
                   : null,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
               onTap: () {
                 provider.setSortBy('expiry');
                 Navigator.pop(context);
               },
             ),
+            const Divider(height: 0, thickness: 1, color: black),
             ListTile(
-              leading: const Icon(Icons.sort_by_alpha),
-              title: const Text('Registration Number'),
+              leading: const Icon(Icons.sort_by_alpha, color: black),
+              title: const Text('REGISTRATION NUMBER', style: TextStyle(fontWeight: FontWeight.w800)),
               trailing: provider.sortBy == 'reg'
-                  ? Icon(Icons.check, color: theme.colorScheme.primary)
+                  ? Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00D676),
+                        border: Border.all(color: black, width: 2),
+                      ),
+                      child: const Icon(Icons.check, color: black, size: 16),
+                    )
                   : null,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
               onTap: () {
                 provider.setSortBy('reg');
                 Navigator.pop(context);
               },
             ),
+            const Divider(height: 0, thickness: 1, color: black),
             ListTile(
-              leading: const Icon(Icons.category),
-              title: const Text('Vehicle Type'),
+              leading: const Icon(Icons.category, color: black),
+              title: const Text('VEHICLE TYPE', style: TextStyle(fontWeight: FontWeight.w800)),
               trailing: provider.sortBy == 'type'
-                  ? Icon(Icons.check, color: theme.colorScheme.primary)
+                  ? Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00D676),
+                        border: Border.all(color: black, width: 2),
+                      ),
+                      child: const Icon(Icons.check, color: black, size: 16),
+                    )
                   : null,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
               onTap: () {
                 provider.setSortBy('type');
                 Navigator.pop(context);
@@ -114,42 +135,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _confirmDelete(int vehicleId, String reg) {
-    final theme = Theme.of(context);
+    const black = Color(0xFF000000);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
         title: Row(
           children: [
-            Icon(Icons.delete_forever, color: theme.colorScheme.error),
-            const SizedBox(width: 8),
-            const Text('Delete Vehicle'),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF0044),
+                border: Border.all(color: black, width: 2),
+              ),
+              child: const Icon(Icons.delete_forever, color: black),
+            ),
+            const SizedBox(width: 12),
+            const Text('DELETE VEHICLE', style: TextStyle(fontWeight: FontWeight.w900)),
           ],
         ),
         content: Text('Are you sure you want to delete $reg?'),
         actions: [
-          TextButton(
+          OutlinedButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: black, width: 2),
+            ),
+            child: const Text('CANCEL', style: TextStyle(fontWeight: FontWeight.w800)),
           ),
-          FilledButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               context.read<VehicleProvider>().deleteVehicle(vehicleId);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Vehicle deleted'),
+                const SnackBar(
+                  content: Text('Vehicle deleted'),
                   behavior: SnackBarBehavior.floating,
-                  backgroundColor: const Color(0xFFBA1A1A),
+                  backgroundColor: Color(0xFFFF0044),
                 ),
               );
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: theme.colorScheme.error,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF0044),
+              foregroundColor: Colors.white,
+              side: const BorderSide(color: black, width: 2),
             ),
-            child: const Text('Delete'),
+            child: const Text('DELETE', style: TextStyle(fontWeight: FontWeight.w800)),
           ),
         ],
       ),
@@ -158,23 +188,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    const black = Color(0xFF000000);
+    const borderWidth = 3.0;
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.local_shipping,
-              color: theme.colorScheme.primary,
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: black, width: 2),
+              ),
+              child: const Icon(Icons.local_shipping, color: black, size: 22),
             ),
             const SizedBox(width: 8),
-            Text(
-              'FleetTax',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.primary,
+            const Text(
+              'FLEETTAX',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 20,
+                letterSpacing: 2,
               ),
             ),
           ],
@@ -187,6 +223,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: _showSortOptions,
           ),
           IconButton(
+            icon: const Icon(Icons.notifications_active),
+            tooltip: 'Test Notification',
+            onPressed: () async {
+              final provider = context.read<VehicleProvider>();
+              await NotificationService.scheduleVehicleNotifications(provider.vehicles);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Notifications triggered!'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            tooltip: 'Test Expiry (3 days)',
+            onPressed: () async {
+              final provider = context.read<VehicleProvider>();
+              final testVehicle = Vehicle(
+                reg: 'TEST-001',
+                type: 'truck',
+                taxPeriod: 'yearly',
+                lastPaid: DateTime.now().subtract(const Duration(days: 333)).toIso8601String().split('T')[0],
+                createdAt: DateTime.now().toIso8601String(),
+              );
+              await provider.addVehicle(testVehicle);
+              await NotificationService.scheduleVehicleNotifications(provider.vehicles);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Test vehicle added and notification triggered!'),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: Color(0xFF00E676),
+                  ),
+                );
+              }
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.open_in_new),
             tooltip: 'Vahan Website',
             onPressed: _openVahanWebsite,
@@ -196,20 +273,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: Column(
         children: [
           const StatsBar(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           const FilterChips(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           // Search Field
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search by registration number...',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search, color: black),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: const Icon(Icons.clear, color: black),
                         onPressed: () {
                           _searchController.clear();
                           context.read<VehicleProvider>().setSearchQuery('');
@@ -217,22 +294,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerLow,
+                fillColor: Colors.white,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth + 1),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
               onChanged: (value) {
                 context.read<VehicleProvider>().setSearchQuery(value);
               },
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           // Vehicle List
           Expanded(
             child: Consumer<VehicleProvider>(
@@ -247,30 +329,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            width: 100,
-                            height: 100,
+                            width: 120,
+                            height: 120,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(28),
+                              color: const Color(0xFFFFD600),
+                              border: Border.all(color: black, width: borderWidth),
+                              boxShadow: const [
+                                BoxShadow(color: black, offset: Offset(4, 4), blurRadius: 0),
+                              ],
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.directions_bus_outlined,
-                              size: 48,
-                              color: theme.colorScheme.primary,
+                              size: 56,
+                              color: black,
                             ),
                           ),
                           const SizedBox(height: 24),
-                          Text(
-                            'No vehicles yet',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: black, width: 2),
+                            ),
+                            child: const Text(
+                              'NO VEHICLES YET',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
+                          const SizedBox(height: 12),
+                          const Text(
                             'Tap + to add your first vehicle',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -286,23 +379,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 64,
-                            color: theme.colorScheme.onSurfaceVariant,
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: black, width: borderWidth),
+                              boxShadow: const [
+                                BoxShadow(color: black, offset: Offset(3, 3), blurRadius: 0),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.search_off,
+                              size: 48,
+                              color: black,
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No matching vehicles',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 24),
+                          const Text(
+                            'NO MATCHING VEHICLES',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
+                          const Text(
                             'Try a different filter or search term',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
                             ),
                           ),
                         ],
@@ -350,17 +455,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddEditScreen()),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Vehicle'),
-        elevation: 4,
-        highlightElevation: 8,
+      floatingActionButton: Container(
+        decoration: const BoxDecoration(
+          border: Border(),
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AddEditScreen()),
+            );
+          },
+          backgroundColor: const Color(0xFFFFD600),
+          foregroundColor: black,
+          icon: const Icon(Icons.add, size: 28),
+          label: const Text(
+            'ADD VEHICLE',
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
+          ),
+          elevation: 4,
+          highlightElevation: 8,
+        ),
       ),
     );
   }

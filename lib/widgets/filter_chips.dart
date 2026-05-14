@@ -7,59 +7,62 @@ class FilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    const black = Color(0xFF000000);
 
     return Consumer<VehicleProvider>(
       builder: (context, provider, child) {
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
               _buildChip(
                 context: context,
-                label: 'All',
+                label: 'ALL',
                 isSelected: provider.filter == VehicleFilter.all,
                 onSelected: () => provider.setFilter(VehicleFilter.all),
+                color: const Color(0xFFFFD600),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               _buildChip(
                 context: context,
-                label: 'Expired',
+                label: 'EXPIRED',
                 isSelected: provider.filter == VehicleFilter.expired,
                 onSelected: () => provider.setFilter(VehicleFilter.expired),
-                color: const Color(0xFFBA1A1A),
+                color: const Color(0xFFFF0044),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               _buildChip(
                 context: context,
-                label: 'Due Soon',
+                label: 'DUE SOON',
                 isSelected: provider.filter == VehicleFilter.soon,
                 onSelected: () => provider.setFilter(VehicleFilter.soon),
-                color: const Color(0xFF8B5E00),
+                color: const Color(0xFFFF6B00),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               _buildChip(
                 context: context,
-                label: 'Valid',
+                label: 'VALID',
                 isSelected: provider.filter == VehicleFilter.valid,
                 onSelected: () => provider.setFilter(VehicleFilter.valid),
-                color: const Color(0xFF1B8B47),
+                color: const Color(0xFF00D676),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               _buildChip(
                 context: context,
-                label: 'Bus',
+                label: 'BUS',
                 isSelected: provider.filter == VehicleFilter.bus,
                 onSelected: () => provider.setFilter(VehicleFilter.bus),
+                color: const Color(0xFF00D9FF),
                 icon: Icons.directions_bus,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               _buildChip(
                 context: context,
-                label: 'Truck',
+                label: 'TRUCK',
                 isSelected: provider.filter == VehicleFilter.truck,
                 onSelected: () => provider.setFilter(VehicleFilter.truck),
+                color: const Color(0xFFFF6B35),
                 icon: Icons.local_shipping,
               ),
             ],
@@ -74,46 +77,47 @@ class FilterChips extends StatelessWidget {
     required String label,
     required bool isSelected,
     required VoidCallback onSelected,
-    Color? color,
+    required Color color,
     IconData? icon,
   }) {
-    final theme = Theme.of(context);
-    final chipColor = color ?? theme.colorScheme.primary;
+    const black = Color(0xFF000000);
+    const borderWidth = 2.0;
 
-    return FilterChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected ? Colors.white : chipColor,
+    return GestureDetector(
+      onTap: onSelected,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? color : Colors.white,
+          border: Border.all(color: black, width: borderWidth),
+          boxShadow: isSelected
+              ? []
+              : const [
+                  BoxShadow(color: black, offset: Offset(2, 2), blurRadius: 0),
+                ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 14,
+                color: black,
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 12,
+                color: isSelected ? black : black.withValues(alpha: 0.7),
+              ),
             ),
-            const SizedBox(width: 4),
           ],
-          Text(
-            label,
-            style: theme.textTheme.labelLarge?.copyWith(
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ],
+        ),
       ),
-      selected: isSelected,
-      onSelected: (_) => onSelected(),
-      selectedColor: chipColor,
-      showCheckmark: false,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      side: isSelected
-          ? BorderSide.none
-          : BorderSide(color: chipColor.withValues(alpha: 0.4)),
-      backgroundColor: theme.colorScheme.surface,
-      elevation: isSelected ? 0 : 1,
-      shadowColor: Colors.black12,
     );
   }
 }

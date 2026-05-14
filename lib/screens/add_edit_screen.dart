@@ -128,7 +128,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 : 'Vehicle added successfully',
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFF1B8B47),
+          backgroundColor: const Color(0xFF00E676),
         ),
       );
     }
@@ -136,28 +136,49 @@ class _AddEditScreenState extends State<AddEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    const black = Color(0xFF000000);
+    const borderWidth = 3.0;
     final dateFormat = DateFormat('dd MMM yyyy');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Vehicle' : 'Add Vehicle'),
+        title: Text(
+          isEditing ? 'EDIT VEHICLE' : 'ADD VEHICLE',
+          style: const TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            letterSpacing: 1,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           children: [
             // Registration Number
             TextFormField(
               controller: _regController,
               decoration: InputDecoration(
-                labelText: 'Registration Number',
+                labelText: 'REGISTRATION NUMBER',
                 hintText: 'e.g., DL01AB1234',
-                prefixIcon: const Icon(Icons.numbers),
+                prefixIcon: const Icon(Icons.numbers, color: black),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerLow,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                labelStyle: const TextStyle(fontWeight: FontWeight.w800),
               ),
               textCapitalization: TextCapitalization.characters,
               validator: (value) {
@@ -167,20 +188,33 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // Vehicle Type
             DropdownButtonFormField<String>(
-              initialValue: _selectedType,
+              value: _selectedType,
               decoration: InputDecoration(
-                labelText: 'Vehicle Type',
-                prefixIcon: const Icon(Icons.directions_car),
+                labelText: 'VEHICLE TYPE',
+                prefixIcon: const Icon(Icons.directions_car, color: black),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerLow,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                labelStyle: const TextStyle(fontWeight: FontWeight.w800),
               ),
               items: const [
-                DropdownMenuItem(value: 'truck', child: Text('Truck')),
-                DropdownMenuItem(value: 'bus', child: Text('Bus')),
+                DropdownMenuItem(value: 'truck', child: Text('TRUCK', style: TextStyle(fontWeight: FontWeight.w800))),
+                DropdownMenuItem(value: 'bus', child: Text('BUS', style: TextStyle(fontWeight: FontWeight.w800))),
               ],
               onChanged: (value) {
                 if (value != null) {
@@ -190,21 +224,34 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 }
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // Tax Period
             DropdownButtonFormField<String>(
-              initialValue: _selectedTaxPeriod,
+              value: _selectedTaxPeriod,
               decoration: InputDecoration(
-                labelText: 'Tax Period',
-                prefixIcon: const Icon(Icons.calendar_month),
+                labelText: 'TAX PERIOD',
+                prefixIcon: const Icon(Icons.calendar_month, color: black),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerLow,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                labelStyle: const TextStyle(fontWeight: FontWeight.w800),
               ),
               items: const [
-                DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
-                DropdownMenuItem(value: 'quarterly', child: Text('Quarterly')),
-                DropdownMenuItem(value: 'yearly', child: Text('Yearly')),
+                DropdownMenuItem(value: 'monthly', child: Text('MONTHLY', style: TextStyle(fontWeight: FontWeight.w800))),
+                DropdownMenuItem(value: 'quarterly', child: Text('QUARTERLY', style: TextStyle(fontWeight: FontWeight.w800))),
+                DropdownMenuItem(value: 'yearly', child: Text('YEARLY', style: TextStyle(fontWeight: FontWeight.w800))),
               ],
               onChanged: (value) {
                 if (value != null) {
@@ -214,65 +261,65 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 }
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // Last Paid Date
-            Card(
-              elevation: 0,
-              color: theme.colorScheme.surfaceContainerLow,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: black, width: borderWidth),
               ),
               child: InkWell(
                 onTap: _selectLastPaidDate,
-                borderRadius: BorderRadius.circular(12),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.event,
-                        color: theme.colorScheme.primary,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD600),
+                          border: Border.all(color: black, width: 2),
+                        ),
+                        child: const Icon(Icons.event, color: black),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Last Paid Date',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                            const Text(
+                              'LAST PAID DATE',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                                color: black,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               dateFormat.format(_lastPaidDate),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 16,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+                      const Icon(Icons.arrow_forward_ios, color: black, size: 20),
                     ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-            // Permit Expiry Date Card
-            Card(
-              elevation: 0,
-              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+            // Permit Expiry Date
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFD600).withValues(alpha: 0.2),
+                border: Border.all(color: black, width: borderWidth),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -281,73 +328,72 @@ class _AddEditScreenState extends State<AddEditScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.verified_user,
-                          color: theme.colorScheme.primary,
-                          size: 20,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFD600),
+                            border: Border.all(color: black, width: 2),
+                          ),
+                          child: const Icon(Icons.verified_user, color: black, size: 18),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Official Permit Expiry (from Vahan 4)',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
+                        const Text(
+                          'OFFICIAL PERMIT EXPIRY (FROM VAHAN 4)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 12,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'Enter the exact expiry date shown on vahan.parivahan.gov.in. This takes priority over calculated tax period.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     InkWell(
                       onTap: _selectPermitExpiryDate,
-                      borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                          ),
+                          color: Colors.white,
+                          border: Border.all(color: black, width: 2),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.event_available,
-                              color: theme.colorScheme.primary,
-                            ),
+                            const Icon(Icons.event_available, color: black),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 _permitExpiryDate != null
                                     ? dateFormat.format(_permitExpiryDate!)
-                                    : 'Not set (use calculated)',
-                                style: theme.textTheme.bodyMedium?.copyWith(
+                                    : 'NOT SET (USE CALCULATED)',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
                                   color: _permitExpiryDate != null
-                                      ? theme.colorScheme.onSurface
-                                      : theme.colorScheme.onSurfaceVariant,
+                                      ? black
+                                      : Colors.grey[700],
                                 ),
                               ),
                             ),
                             if (_permitExpiryDate != null)
-                              IconButton(
-                                icon: const Icon(Icons.clear, size: 20),
-                                onPressed: _clearPermitExpiry,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
+                              GestureDetector(
+                                onTap: _clearPermitExpiry,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF0044),
+                                    border: Border.all(color: black, width: 2),
+                                  ),
+                                  child: const Icon(Icons.clear, color: Colors.white, size: 16),
+                                ),
                               )
                             else
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
+                              const Icon(Icons.arrow_forward_ios, color: black, size: 16),
                           ],
                         ),
                       ),
@@ -356,30 +402,62 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // Notes
             TextFormField(
               controller: _notesController,
               decoration: InputDecoration(
-                labelText: 'Notes (optional)',
+                labelText: 'NOTES (OPTIONAL)',
                 hintText: 'Any additional notes...',
-                prefixIcon: const Icon(Icons.note),
+                prefixIcon: const Icon(Icons.note, color: black),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerLow,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                labelStyle: const TextStyle(fontWeight: FontWeight.w800),
               ),
               maxLines: 3,
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 24),
 
             // Save Button
-            FilledButton.icon(
-              onPressed: _saveVehicle,
-              icon: Icon(isEditing ? Icons.save : Icons.add),
-              label: Text(isEditing ? 'Save Changes' : 'Add Vehicle'),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                minimumSize: const Size(double.infinity, 52),
+            Container(
+              decoration: const BoxDecoration(
+                boxShadow: [
+                  BoxShadow(color: black, offset: Offset(4, 4), blurRadius: 0),
+                ],
+              ),
+              child: ElevatedButton(
+                onPressed: _saveVehicle,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFFD600),
+                  foregroundColor: black,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  side: const BorderSide(color: black, width: borderWidth),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(isEditing ? Icons.save : Icons.add, size: 22),
+                    const SizedBox(width: 8),
+                    Text(
+                      isEditing ? 'SAVE CHANGES' : 'ADD VEHICLE',
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

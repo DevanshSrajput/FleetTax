@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/vehicle.dart';
 import '../db/database_helper.dart';
+import '../services/notification_service.dart';
 
 enum VehicleFilter { all, expired, soon, valid, bus, truck }
 
@@ -86,6 +87,7 @@ class VehicleProvider extends ChangeNotifier {
 
   Future<void> load() async {
     _vehicles = await _db.getAll();
+    await NotificationService.scheduleVehicleNotifications(_vehicles);
     notifyListeners();
   }
 
@@ -93,6 +95,7 @@ class VehicleProvider extends ChangeNotifier {
     final id = await _db.insert(vehicle);
     final newVehicle = vehicle.copyWith(id: id);
     _vehicles.add(newVehicle);
+    await NotificationService.scheduleVehicleNotifications(_vehicles);
     notifyListeners();
   }
 
@@ -102,12 +105,14 @@ class VehicleProvider extends ChangeNotifier {
     if (index != -1) {
       _vehicles[index] = vehicle;
     }
+    await NotificationService.scheduleVehicleNotifications(_vehicles);
     notifyListeners();
   }
 
   Future<void> deleteVehicle(int id) async {
     await _db.delete(id);
     _vehicles.removeWhere((v) => v.id == id);
+    await NotificationService.scheduleVehicleNotifications(_vehicles);
     notifyListeners();
   }
 

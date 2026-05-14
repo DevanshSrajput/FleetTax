@@ -67,10 +67,10 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
       Navigator.pop(context);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Payment recorded successfully'),
+        const SnackBar(
+          content: Text('Payment recorded successfully'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFF1B8B47),
+          backgroundColor: Color(0xFF00E676),
         ),
       );
     }
@@ -78,44 +78,56 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    const black = Color(0xFF000000);
+    const borderWidth = 3.0;
     final dateFormat = DateFormat('dd MMM yyyy');
     final provider = context.read<VehicleProvider>();
     final vehicle = provider.getVehicleById(widget.vehicleId);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mark as Paid'),
+        title: const Text(
+          'MARK AS PAID',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            letterSpacing: 1,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           children: [
             if (vehicle != null) ...[
-              Card(
-                elevation: 0,
-                color: theme.colorScheme.surfaceContainerLow,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              // Vehicle Info Card
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: black, width: borderWidth),
+                  boxShadow: const [
+                    BoxShadow(color: black, offset: Offset(4, 4), blurRadius: 0),
+                  ],
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
                       Container(
-                        width: 48,
-                        height: 48,
+                        width: 56,
+                        height: 56,
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(14),
+                          color: const Color(0xFFFFD600),
+                          border: Border.all(color: black, width: borderWidth),
                         ),
                         child: Icon(
                           vehicle.type == 'bus'
                               ? Icons.directions_bus
                               : Icons.local_shipping,
-                          color: theme.colorScheme.primary,
+                          color: black,
+                          size: 28,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -125,16 +137,24 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
                           children: [
                             Text(
                               vehicle.reg.toUpperCase(),
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                                letterSpacing: 1.5,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '${vehicle.type.toUpperCase()} - ${vehicle.taxPeriod}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: black, width: 2),
+                              ),
+                              child: Text(
+                                '${vehicle.type.toUpperCase()} - ${vehicle.taxPeriod.toUpperCase()}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 10,
+                                ),
                               ),
                             ),
                           ],
@@ -148,69 +168,82 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
             ],
 
             // Payment Date
-            Card(
-              elevation: 0,
-              color: theme.colorScheme.surfaceContainerLow,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: black, width: borderWidth),
               ),
               child: InkWell(
                 onTap: _selectDate,
-                borderRadius: BorderRadius.circular(12),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.event,
-                        color: theme.colorScheme.primary,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00D9FF),
+                          border: Border.all(color: black, width: 2),
+                        ),
+                        child: const Icon(Icons.event, color: black),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Payment Date',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                            const Text(
+                              'PAYMENT DATE',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               dateFormat.format(_paymentDate),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+                      const Icon(Icons.arrow_forward_ios, color: black, size: 20),
                     ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // Tax Period
             DropdownButtonFormField<String>(
-              initialValue: _selectedTaxPeriod,
+              value: _selectedTaxPeriod,
               decoration: InputDecoration(
-                labelText: 'Tax Period',
-                prefixIcon: const Icon(Icons.calendar_month),
+                labelText: 'TAX PERIOD',
+                prefixIcon: const Icon(Icons.calendar_month, color: black),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerLow,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                labelStyle: const TextStyle(fontWeight: FontWeight.w800),
               ),
               items: const [
-                DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
-                DropdownMenuItem(value: 'quarterly', child: Text('Quarterly')),
-                DropdownMenuItem(value: 'yearly', child: Text('Yearly')),
+                DropdownMenuItem(value: 'monthly', child: Text('MONTHLY', style: TextStyle(fontWeight: FontWeight.w800))),
+                DropdownMenuItem(value: 'quarterly', child: Text('QUARTERLY', style: TextStyle(fontWeight: FontWeight.w800))),
+                DropdownMenuItem(value: 'yearly', child: Text('YEARLY', style: TextStyle(fontWeight: FontWeight.w800))),
               ],
               onChanged: (value) {
                 if (value != null) {
@@ -220,42 +253,59 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
                 }
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // Receipt Reference
             TextFormField(
               controller: _receiptRefController,
               decoration: InputDecoration(
-                labelText: 'Receipt Reference (optional)',
+                labelText: 'RECEIPT REFERENCE (OPTIONAL)',
                 hintText: 'e.g., RECPT-2025-001234',
-                prefixIcon: const Icon(Icons.receipt),
+                prefixIcon: const Icon(Icons.receipt, color: black),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerLow,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: const BorderSide(color: black, width: borderWidth),
+                ),
+                labelStyle: const TextStyle(fontWeight: FontWeight.w800),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             // Info Card
-            Card(
-              elevation: 0,
-              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFD600).withValues(alpha: 0.2),
+                border: Border.all(color: black, width: borderWidth),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: theme.colorScheme.primary,
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFD600),
+                        border: Border.all(color: black, width: 2),
+                      ),
+                      child: const Icon(Icons.info_outline, color: black, size: 18),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         'The expiry date will be recalculated based on the payment date and tax period.',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
                         ),
                       ),
                     ),
@@ -263,16 +313,35 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 24),
 
             // Mark Paid Button
-            FilledButton.icon(
-              onPressed: _markAsPaid,
-              icon: const Icon(Icons.payments),
-              label: const Text('Confirm Payment'),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                minimumSize: const Size(double.infinity, 52),
+            Container(
+              decoration: const BoxDecoration(
+                boxShadow: [
+                  BoxShadow(color: black, offset: Offset(4, 4), blurRadius: 0),
+                ],
+              ),
+              child: ElevatedButton(
+                onPressed: _markAsPaid,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00E676),
+                  foregroundColor: black,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  side: const BorderSide(color: black, width: borderWidth),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.payments, size: 22),
+                    SizedBox(width: 8),
+                    Text(
+                      'CONFIRM PAYMENT',
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

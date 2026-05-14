@@ -7,46 +7,48 @@ class StatsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // Neo-brutalism colors
+    const black = Color(0xFF000000);
+    const borderWidth = 3.0;
 
     return Consumer<VehicleProvider>(
       builder: (context, provider, child) {
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(8),
           child: Row(
             children: [
               Expanded(
                 child: _StatTile(
-                  label: 'Total',
+                  label: 'TOTAL',
                   value: provider.totalCount,
-                  color: theme.colorScheme.primary,
+                  color: const Color(0xFFFFD600),
                   icon: Icons.directions_bus,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Expanded(
                 child: _StatTile(
-                  label: 'Expired',
+                  label: 'EXPIRED',
                   value: provider.expiredCount,
-                  color: const Color(0xFFBA1A1A),
+                  color: const Color(0xFFFF0044),
                   icon: Icons.error,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Expanded(
                 child: _StatTile(
-                  label: 'Due Soon',
+                  label: 'DUE SOON',
                   value: provider.dueSoonCount,
-                  color: const Color(0xFF8B5E00),
+                  color: const Color(0xFFFF6B00),
                   icon: Icons.warning,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Expanded(
                 child: _StatTile(
-                  label: 'Valid',
+                  label: 'VALID',
                   value: provider.validCount,
-                  color: const Color(0xFF1B8B47),
+                  color: const Color(0xFF00D676),
                   icon: Icons.check_circle,
                 ),
               ),
@@ -73,36 +75,45 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    const black = Color(0xFF000000);
+    const borderWidth = 3.0;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        color: Colors.white,
+        border: Border.all(color: black, width: borderWidth),
+        boxShadow: const [
+          BoxShadow(color: black, offset: Offset(3, 3), blurRadius: 0),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color,
+              border: Border.all(color: black, width: 2),
+            ),
+            child: Icon(icon, color: black, size: 18),
+          ),
+          const SizedBox(height: 8),
           Text(
             value.toString(),
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
+            style: const TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 24,
+              color: black,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: color.withValues(alpha: 0.8),
-              fontWeight: FontWeight.w500,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 9,
+              color: black,
             ),
             textAlign: TextAlign.center,
           ),
