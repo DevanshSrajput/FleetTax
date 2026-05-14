@@ -1,0 +1,746 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf-8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+\usepackage{verbatim}
+
+% Color definitions for neo-brutalism theme
+\definecolor{darkbg}{RGB}{20, 20, 20}
+\definecolor{brightred}{RGB}{255, 0, 68}
+\definecolor{brightyellow}{RGB}{255, 107, 53}
+\definecolor{brightgreen}{RGB}{0, 230, 118}
+\definecolor{brightcyan}{RGB}{0, 255, 255}
+
+% Code listing style
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    rulecolor=\color{black},
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numberstyle=\tiny,
+    numbersep=5pt,
+    stepnumber=1,
+    tabsize=2,
+}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{FleetTax v1.0.0}
+\lhead{Technical Documentation}
+\rfoot{\thepage}
+\lfoot{\today}
+
+% Title Page
+\title{\LARGE \textbf{FleetTax}\\[0.5cm] \Large Vahan Road Tax Tracker for Fleet Owners\\[0.2cm] \normalsize Technical Documentation}
+\author{Developer: Devansh Singh\\GitHub: \texttt{DevanshSrajput}\\Portfolio: \texttt{https://devanshsingh.dev}}
+\date{Version 1.0.0 \\ \today}
+
+\begin{document}
+
+% Title page
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+% Table of Contents
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\subsection{Overview}
+FleetTax is a fully offline Android application built with Flutter that enables bus and truck fleet owners to efficiently track Vahan road tax payment deadlines. The app eliminates the need for manual tracking by automatically calculating tax expiry dates, sending daily push notifications starting 10 days before expiration, and providing direct integration with the Vahan portal for hassle-free tax payment.
+
+\subsection{Key Objectives}
+\begin{itemize}
+    \item Track tax deadlines for multiple vehicles with zero cloud dependency
+    \item Automatically calculate expiry dates based on tax payment periods (monthly, quarterly, yearly)
+    \item Send timely push notifications to prevent missed payments
+    \item Provide an intuitive, offline-first user experience
+    \item Use modern Flutter architecture with state management and local persistence
+\end{itemize}
+
+\subsection{Target Audience}
+Fleet owners managing multiple commercial vehicles (buses and trucks) who need a reliable, offline solution for tax deadline management in Indian market.
+
+\newpage
+
+\section{Feature Overview}
+
+\subsection{Core Features}
+
+\subsubsection{Vehicle Management}
+\begin{itemize}
+    \item \textbf{Add Vehicle}: Register new vehicles with registration number, type (bus/truck), tax period, last payment date, and optional notes
+    \item \textbf{Edit Vehicle}: Modify any vehicle details at any time
+    \item \textbf{Delete Vehicle}: Remove vehicles with confirmation dialog
+    \item \textbf{Vehicle Persistence}: All data stored locally using SQLite
+\end{itemize}
+
+\subsubsection{Dashboard}
+\begin{itemize}
+    \item \textbf{Statistics Bar}: Display total vehicles, expired count, due soon count, and valid count
+    \item \textbf{Vehicle Cards}: Color-coded status cards showing vehicle details and days remaining
+    \item \textbf{Search}: Search vehicles by registration number
+    \item \textbf{Filter}: Filter by status (expired/due soon/valid) or vehicle type (bus/truck)
+    \item \textbf{Sort}: Sort by expiry soonest, registration number, or vehicle type
+\end{itemize}
+
+\subsubsection{Tax Expiry Calculation}
+\begin{itemize}
+    \item \textbf{Auto-Calculation}: System automatically computes validity end date from last paid date + tax period
+    \item \textbf{Status Tracking}: Shows days remaining until expiry
+    \item \textbf{Three Period Types}:
+    \begin{itemize}
+        \item \textbf{Monthly}: 1 month validity
+        \item \textbf{Quarterly}: 3 months validity
+        \item \textbf{Yearly}: 12 months validity
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Payment Tracking}
+\begin{itemize}
+    \item \textbf{Mark as Paid}: Log new tax payments with payment date, period, and receipt reference
+    \item \textbf{Auto-Recalculation}: Expiry date automatically recalculated upon marking as paid
+    \item \textbf{Receipt Reference}: Store optional receipt numbers for payment verification
+\end{itemize}
+
+\subsubsection{Notifications}
+\begin{itemize}
+    \item \textbf{Daily Alerts}: Push notifications fire every day from T-10 days until tax is marked paid
+    \item \textbf{Background Execution}: Uses WorkManager to run even when app is closed
+    \item \textbf{Persistent}: Reliably delivers notifications on Android 13+
+    \item \textbf{Custom Messages}: Shows vehicle registration and days remaining
+\end{itemize}
+
+\subsubsection{Vahan Integration}
+\begin{itemize}
+    \item \textbf{Quick-Launch}: One-tap button to open Vahan portal (vahan.parivahan.gov.in)
+    \item \textbf{In-Browser Payment}: Users can complete tax payment directly from Vahan website
+\end{itemize}
+
+\subsection{Status Color Coding}
+\begin{itemize}
+    \item \textbf{Expired}: Bold Red (\#FF0044) — Tax payment overdue
+    \item \textbf{Due Soon}: Bold Orange (\#FF6B35) — Tax expiring within 10 days
+    \item \textbf{Valid}: Bold Green (\#00E676) — Tax payment current and valid
+\end{itemize}
+
+\newpage
+
+\section{Technology Stack}
+
+\subsection{Frontend Framework}
+\textbf{Flutter 3.x}: Cross-platform mobile development framework providing:
+\begin{itemize}
+    \item Native-like performance
+    \item Material Design UI components
+    \item Hot reload for rapid development
+    \item Compiled to Android native code
+\end{itemize}
+
+\subsection{Programming Language}
+\textbf{Dart 3.x}: Modern, statically-typed language with:
+\begin{itemize}
+    \item Strong type system for safety
+    \item Garbage collection
+    \item Async/await for clean asynchronous code
+\end{itemize}
+
+\subsection{State Management}
+\textbf{Provider}: Lightweight, reactive state management providing:
+\begin{itemize}
+    \item Model-View-Controller (MVC) pattern
+    \item Scoped state
+    \item Automatic widget rebuilds on state change
+\end{itemize}
+
+\subsection{Local Database}
+\textbf{SQLite via sqflite}: Embedded relational database offering:
+\begin{itemize}
+    \item Zero configuration
+    \item On-device persistence
+    \item Full ACID compliance
+    \item Support for complex queries
+\end{itemize}
+
+\subsection{Push Notifications}
+\textbf{flutter\_local\_notifications}: Cross-platform local notification system
+
+\subsection{Background Tasks}
+\textbf{WorkManager}: Reliable background job scheduling:
+\begin{itemize}
+    \item Survives app restart
+    \item Periodic task registration
+    \item Guaranteed execution even when app is closed
+\end{itemize}
+
+\subsection{Additional Libraries}
+\begin{itemize}
+    \item \textbf{intl}: Date/time formatting and localization
+    \item \textbf{url\_launcher}: Open URLs and launch external apps
+    \item \textbf{path}: File path manipulation and resolution
+\end{itemize}
+
+\newpage
+
+\section{Architecture}
+
+\subsection{Project Structure}
+
+\begin{verbatim}
+lib/
+├── main.dart                           # App entry point & initialization
+├── models/
+│   └── vehicle.dart                    # Vehicle data model & business logic
+├── db/
+│   └── database_helper.dart            # SQLite CRUD operations
+├── services/
+│   ├── notification_service.dart       # Push notification management
+│   └── workmanager_service.dart        # Background task orchestration
+├── providers/
+│   └── vehicle_provider.dart           # State management (Provider pattern)
+├── screens/
+│   ├── splash_screen.dart              # App initialization screen
+│   ├── dashboard_screen.dart           # Main vehicle list view
+│   ├── add_edit_screen.dart            # Vehicle form (add/edit)
+│   └── mark_paid_screen.dart           # Payment logging screen
+└── widgets/
+    ├── vehicle_card.dart               # Individual vehicle tile
+    ├── stats_bar.dart                  # Statistics summary bar
+    └── filter_chips.dart               # Filter and sort controls
+\end{verbatim}
+
+\subsection{Architectural Patterns}
+
+\subsubsection{Model-View-ViewModel (MVVM)}
+The Provider pattern implements MVVM for clean separation of concerns:
+\begin{itemize}
+    \item \textbf{Model}: Vehicle class encapsulates data and business logic
+    \item \textbf{ViewModel}: VehicleProvider manages state and notifies UI of changes
+    \item \textbf{View}: Screens and widgets consume state and dispatch actions
+\end{itemize}
+
+\subsubsection{Singleton Pattern}
+DatabaseHelper uses singleton pattern to ensure single database connection throughout app lifecycle.
+
+\subsubsection{Service Locator}
+NotificationService and WorkmanagerService provide static methods for easy access across the app.
+
+\newpage
+
+\section{Database Schema}
+
+\subsection{Vehicles Table}
+
+\begin{lstlisting}[language=sql]
+CREATE TABLE vehicles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reg TEXT NOT NULL,
+    type TEXT NOT NULL,
+    tax_period TEXT NOT NULL,
+    last_paid TEXT NOT NULL,
+    notes TEXT,
+    receipt_ref TEXT,
+    created_at TEXT NOT NULL
+);
+\end{lstlisting}
+
+\subsection{Column Descriptions}
+
+\begin{longtable}{|p{2cm}|p{2.5cm}|p{6cm}|}
+\hline
+\textbf{Column} & \textbf{Type} & \textbf{Description} \\
+\hline
+\endhead
+id & INTEGER & Primary key, auto-incrementing unique identifier \\
+\hline
+reg & TEXT & Vehicle registration number (e.g., ``DL01AB1234'') \\
+\hline
+type & TEXT & Vehicle type: ``bus'' or ``truck'' \\
+\hline
+tax\_period & TEXT & Tax validity period: ``monthly'', ``quarterly'', or ``yearly'' \\
+\hline
+last\_paid & TEXT & ISO 8601 date of last tax payment (e.g., ``2025-05-01'') \\
+\hline
+notes & TEXT & Optional notes or comments about the vehicle \\
+\hline
+receipt\_ref & TEXT & Optional receipt reference number for payment verification \\
+\hline
+created\_at & TEXT & ISO 8601 timestamp of record creation \\
+\hline
+\end{longtable}
+
+\subsection{Queries Overview}
+
+\subsubsection{Retrieve All Vehicles}
+\begin{lstlisting}[language=sql]
+SELECT * FROM vehicles ORDER BY last_paid DESC;
+\end{lstlisting}
+
+\subsubsection{Find Vehicles Expiring Soon}
+\begin{lstlisting}[language=sql]
+SELECT * FROM vehicles 
+WHERE julianday('now') - julianday(last_paid) >= 
+    CASE tax_period 
+        WHEN 'monthly' THEN 30
+        WHEN 'quarterly' THEN 90
+        WHEN 'yearly' THEN 360
+    END - 10;
+\end{lstlisting}
+
+\newpage
+
+\section{Core Components}
+
+\subsection{Vehicle Model}
+
+The Vehicle class encapsulates vehicle data and expiry calculation logic:
+
+\begin{lstlisting}[language=dart]
+class Vehicle {
+  final int? id;
+  final String reg;
+  final String type;           // 'bus' or 'truck'
+  final String taxPeriod;      // 'monthly', 'quarterly', 'yearly'
+  final String lastPaid;       // 'YYYY-MM-DD'
+  final String? notes;
+  final String? receiptRef;
+  
+  DateTime get expiryDate {
+    final d = DateTime.parse(lastPaid);
+    if (taxPeriod == 'monthly')
+      return DateTime(d.year, d.month + 1, d.day);
+    if (taxPeriod == 'quarterly')
+      return DateTime(d.year, d.month + 3, d.day);
+    return DateTime(d.year + 1, d.month, d.day);
+  }
+  
+  int get daysLeft =>
+      expiryDate.difference(DateTime.now()).inDays;
+  
+  String get status {
+    if (daysLeft < 0) return 'expired';
+    if (daysLeft <= 10) return 'soon';
+    return 'valid';
+  }
+}
+\end{lstlisting}
+
+\subsection{VehicleProvider}
+
+Manages the state of all vehicles and coordinates operations:
+
+\begin{itemize}
+    \item \textbf{load()}: Fetch all vehicles from database
+    \item \textbf{add()}: Create new vehicle record
+    \item \textbf{update()}: Modify existing vehicle
+    \item \textbf{delete()}: Remove vehicle from database
+    \item \textbf{markPaid()}: Log payment and reschedule notifications
+    \item \textbf{getFiltered()}: Return filtered vehicle list based on criteria
+\end{itemize}
+
+\subsection{DatabaseHelper}
+
+Singleton database manager providing SQLite operations:
+
+\begin{itemize}
+    \item \textbf{insert()}: Add new vehicle
+    \item \textbf{update()}: Modify vehicle details
+    \item \textbf{delete()}: Remove vehicle
+    \item \textbf{getAll()}: Retrieve all vehicles
+    \item \textbf{database}: Lazy-loaded database connection property
+\end{itemize}
+
+\subsection{NotificationService}
+
+Handles local push notifications:
+
+\begin{itemize}
+    \item \textbf{init()}: Initialize flutter\_local\_notifications plugin
+    \item \textbf{showAlert()}: Display notification for specific vehicle
+    \item \textbf{cancelAll()}: Clear all pending notifications
+\end{itemize}
+
+\subsection{WorkManager Service}
+
+Orchestrates background daily tax expiry checks:
+
+\begin{itemize}
+    \item \textbf{callbackDispatcher()}: Entry point for background execution
+    \item \textbf{initWorkManager()}: Register periodic daily task
+    \item Executes every 24 hours to check and notify about due taxes
+\end{itemize}
+
+\newpage
+
+\section{Installation Guide}
+
+\subsection{Prerequisites}
+
+\begin{itemize}
+    \item \textbf{Flutter SDK}: Version 3.11.5 or later (latest stable recommended)
+    \item \textbf{Android Studio}: Latest version with Android SDK 33+ installed
+    \item \textbf{Android Device/Emulator}: API 33 (Android 13) or higher recommended
+    \item \textbf{Git}: For cloning the repository
+\end{itemize}
+
+\subsection{Step 1: Clone Repository}
+
+\begin{lstlisting}[language=bash]
+git clone https://github.com/DevanshSrajput/FleetTax.git
+cd FleetTax
+\end{lstlisting}
+
+\subsection{Step 2: Install Flutter Dependencies}
+
+\begin{lstlisting}[language=bash]
+flutter pub get
+\end{lstlisting}
+
+\subsection{Step 3: Verify Setup}
+
+\begin{lstlisting}[language=bash]
+flutter doctor
+\end{lstlisting}
+
+All items must show ✓ checkmark. Fix any reported issues before proceeding.
+
+\subsection{Step 4: Run on Emulator}
+
+\begin{lstlisting}[language=bash]
+# List available devices
+flutter devices
+
+# Run on specific device
+flutter run -d <device-id>
+\end{lstlisting}
+
+\subsection{Step 5: Build Release APK}
+
+\begin{lstlisting}[language=bash]
+flutter build apk --release
+\end{lstlisting}
+
+Output file: \texttt{build/app/outputs/flutter-apk/app-release.apk}
+
+\newpage
+
+\section{Building for Production}
+
+\subsection{Android Configuration}
+
+Update \texttt{android/app/src/main/AndroidManifest.xml}:
+
+\begin{lstlisting}[language=xml]
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+<uses-permission android:name="android.permission.INTERNET"/>
+\end{lstlisting}
+
+\subsection{Build Types}
+
+\subsubsection{Debug Build}
+\begin{lstlisting}[language=bash]
+flutter run
+\end{lstlisting}
+
+\subsubsection{Release Build}
+\begin{lstlisting}[language=bash]
+flutter build apk --release
+\end{lstlisting}
+
+\subsubsection{App Bundle (for Play Store)}
+\begin{lstlisting}[language=bash]
+flutter build appbundle --release
+\end{lstlisting}
+
+\newpage
+
+\section{Notification System}
+
+\subsection{Architecture}
+
+The notification system uses a two-layer approach:
+
+\begin{enumerate}
+    \item \textbf{Local Notifications}: flutter\_local\_notifications plugin for showing alerts on device
+    \item \textbf{Background Task}: WorkManager for reliable daily execution
+\end{enumerate}
+
+\subsection{Flow Diagram}
+
+\begin{verbatim}
+App Launch
+    ↓
+NotificationService.init()
+    ↓
+initWorkManager()
+    ↓
+Register PeriodicTask (every 24 hours)
+    ↓
+Daily Execution:
+    ├→ Load all vehicles from DB
+    ├→ Check each vehicle's daysLeft
+    ├→ If daysLeft <= 10: showAlert()
+    └→ Persist notifications across app restarts
+\end{verbatim}
+
+\subsection{Notification Permissions}
+
+\subsubsection{Runtime Permission (Android 13+)}
+
+In \texttt{main.dart}:
+
+\begin{lstlisting}[language=dart]
+await Permission.notification.request();
+\end{lstlisting}
+
+\subsubsection{Manufacturer-Specific Settings}
+
+On Xiaomi, OnePlus, Oppo, Samsung devices:
+\begin{itemize}
+    \item Navigate to Settings → Battery/Power
+    \item Find FleetTax in battery optimization list
+    \item Select ``Allow background activity''
+\end{itemize}
+
+\newpage
+
+\section{Troubleshooting}
+
+\subsection{Common Issues}
+
+\subsubsection{Notifications Not Showing}
+
+\textbf{Cause}: Permission not granted at runtime.
+
+\textbf{Solution}:
+\begin{enumerate}
+    \item Go to Settings → Apps → FleetTax
+    \item Enable ``Notifications'' permission
+    \item Restart the app
+\end{enumerate}
+
+\subsubsection{WorkManager Not Firing}
+
+\textbf{Cause}: Android power management killing background tasks.
+
+\textbf{Solution}:
+\begin{enumerate}
+    \item Check battery optimization settings (see Manufacturer-Specific Settings above)
+    \item Test manually by adding temporary button:
+\end{enumerate}
+
+\begin{lstlisting}[language=dart]
+ElevatedButton(
+  onPressed: () => Workmanager().registerOneOffTask(
+    'test_now', 'daily_tax_check'),
+  child: Text('Test: Trigger notifications'),
+)
+\end{lstlisting}
+
+\subsubsection{SDK Not Found}
+
+\textbf{Cause}: Flutter or Android SDK path not configured.
+
+\textbf{Solution}:
+
+\begin{lstlisting}[language=bash]
+flutter doctor
+# Follow all recommendations
+flutter doctor --android-licenses
+\end{lstlisting}
+
+\subsubsection{MissingPluginException}
+
+\textbf{Cause}: Plugin native code not linked.
+
+\textbf{Solution}:
+
+\begin{lstlisting}[language=bash]
+flutter clean
+flutter pub get
+flutter run
+\end{lstlisting}
+
+\subsubsection{App Crashes on Launch}
+
+\textbf{Cause}: Likely missing \texttt{await} in async initialization.
+
+\textbf{Solution}:
+
+\begin{lstlisting}[language=bash]
+flutter logs
+# Review full error trace and check main.dart
+\end{lstlisting}
+
+\newpage
+
+\section{API Reference}
+
+\subsection{Vehicle Class}
+
+\subsubsection{Constructors}
+
+\begin{lstlisting}[language=dart]
+Vehicle({
+  int? id,
+  required String reg,
+  required String type,           // 'bus' | 'truck'
+  required String taxPeriod,      // 'monthly' | 'quarterly' | 'yearly'
+  required String lastPaid,       // ISO 8601 date
+  String? notes,
+  String? receiptRef,
+})
+\end{lstlisting}
+
+\subsubsection{Getters}
+
+\begin{itemize}
+    \item \texttt{DateTime expiryDate}: Calculated tax expiry date
+    \item \texttt{int daysLeft}: Days until expiry (negative if expired)
+    \item \texttt{String status}: One of ``expired'', ``soon'', ``valid''
+\end{itemize}
+
+\subsubsection{Methods}
+
+\begin{itemize}
+    \item \texttt{Map<String, dynamic> toMap()}: Convert to database-friendly map
+    \item \texttt{Vehicle.fromMap()}: Factory constructor from database map
+\end{itemize}
+
+\subsection{VehicleProvider Class}
+
+\subsubsection{Properties}
+
+\begin{itemize}
+    \item \texttt{List<Vehicle> vehicles}: Current list of all vehicles
+    \item \texttt{bool isLoading}: Loading state indicator
+\end{itemize}
+
+\subsubsection{Methods}
+
+\begin{itemize}
+    \item \texttt{Future<void> load()}: Load all vehicles from database
+    \item \texttt{Future<void> add(Vehicle v)}: Insert new vehicle
+    \item \texttt{Future<void> update(Vehicle v)}: Update existing vehicle
+    \item \texttt{Future<void> delete(int id)}: Delete vehicle by ID
+    \item \texttt{Future<void> markPaid(int id, String date, String period)}: Log payment
+    \item \texttt{List<Vehicle> getFiltered()}: Return filtered list based on current filters
+\end{itemize}
+
+\subsection{DatabaseHelper Class}
+
+\subsubsection{Static Methods}
+
+\begin{itemize}
+    \item \texttt{Future<Database> get database}: Get or create database connection
+    \item \texttt{Future<int> insert(Vehicle v)}: Add vehicle, returns ID
+    \item \texttt{Future<int> update(Vehicle v)}: Update vehicle, returns rows affected
+    \item \texttt{Future<int> delete(int id)}: Delete vehicle, returns rows affected
+    \item \texttt{Future<List<Vehicle>> getAll()}: Get all vehicles from database
+\end{itemize}
+
+\newpage
+
+\section{Contributing}
+
+\subsection{Getting Started}
+
+\begin{enumerate}
+    \item Fork the repository on GitHub
+    \item Clone your fork: \texttt{git clone https://github.com/YOUR-USERNAME/FleetTax.git}
+    \item Create feature branch: \texttt{git checkout -b feature/your-feature-name}
+    \item Make your changes following the code style
+    \item Commit with descriptive message: \texttt{git commit -m 'feat: add feature description'}
+    \item Push to branch: \texttt{git push origin feature/your-feature-name}
+    \item Open Pull Request with detailed description
+\end{enumerate}
+
+\subsection{Code Style Guidelines}
+
+\begin{itemize}
+    \item Use consistent formatting (Flutter recommends: 2-space indentation)
+    \item Follow Dart naming conventions (camelCase for variables, PascalCase for classes)
+    \item Add comments for complex logic
+    \item Write self-documenting code when possible
+    \item Run \texttt{flutter analyze} before committing
+\end{itemize}
+
+\newpage
+
+\section{Roadmap}
+
+\subsection{Version 1.0 (Current)}
+\begin{itemize}
+    \item[✓] Vehicle CRUD operations
+    \item[✓] Tax expiry calculation (monthly/quarterly/yearly)
+    \item[✓] Dashboard with color-coded status
+    \item[✓] Filter, search, and sort functionality
+    \item[✓] Mark payment with receipt reference
+    \item[✓] Daily push notifications via WorkManager
+    \item[✓] Vahan portal quick-launch
+    \item[✓] Fully offline operation
+\end{itemize}
+
+\subsection{Version 2.0 (Planned)}
+\begin{itemize}
+    \item [ ] Insurance expiry tracking
+    \item [ ] Fitness certificate (FC) tracking
+    \item [ ] Google Drive backup and restore
+    \item [ ] PDF receipt capture per payment
+    \item [ ] Multi-owner and driver assignment
+    \item [ ] Play Store release
+    \item [ ] Cloud synchronization (optional)
+\end{itemize}
+
+\newpage
+
+\section{License}
+
+FleetTax is released under the MIT License. See LICENSE file in repository for full text.
+
+\begin{verbatim}
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+\end{verbatim}
+
+\newpage
+
+\section{About the Developer}
+
+\textbf{Devansh Singh} is a software developer specializing in cross-platform mobile development with Flutter and Dart.
+
+\begin{itemize}
+    \item \textbf{GitHub}: \url{https://github.com/DevanshSrajput}
+    \item \textbf{Portfolio}: \url{https://devanshsingh.dev}
+    \item \textbf{Project Repository}: \url{https://github.com/DevanshSrajput/FleetTax}
+\end{itemize}
+
+This documentation was automatically generated for FleetTax v1.0.0.
+
+\end{document}
