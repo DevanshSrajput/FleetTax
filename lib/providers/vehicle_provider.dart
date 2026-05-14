@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import '../models/vehicle.dart';
 import '../db/database_helper.dart';
 import '../services/notification_service.dart';
@@ -12,15 +13,33 @@ class VehicleProvider extends ChangeNotifier {
   VehicleFilter _filter = VehicleFilter.all;
   String _sortBy = 'expiry';
 
-  List<Vehicle> get vehicles => _getFilteredVehicles();
+  // Cached filtered/sorted results
+  List<Vehicle>? _cachedVehicles;
+  int? _cachedTotalCount;
+  int? _cachedExpiredCount;
+  int? _cachedDueSoonCount;
+  int? _cachedValidCount;
+
+  void _invalidateCache() {
+    _cachedVehicles = null;
+    _cachedTotalCount = null;
+    _cachedExpiredCount = null;
+    _cachedDueSoonCount = null;
+    _cachedValidCount = null;
+  }
+
+  List<Vehicle> get vehicles {
+    if (_cachedVehicles != null) return _cachedVehicles!;
+    _cachedVehicles = _getFilteredVehicles();
+    return _cachedVehicles!;
+  }
 
   List<Vehicle> _getFilteredVehicles() {
     List<Vehicle> result = List.from(_vehicles);
 
     if (_searchQuery.isNotEmpty) {
-      result = result
-          .where((v) => v.reg.toLowerCase().contains(_searchQuery.toLowerCase()))
-          .toList();
+      final query = _searchQuery.toLowerCase();
+      result = result.where((v) => v.reg.toLowerCase().contains(query)).toList();
     }
 
     switch (_filter) {
@@ -58,10 +77,25 @@ class VehicleProvider extends ChangeNotifier {
     return result;
   }
 
-  int get totalCount => _vehicles.length;
-  int get expiredCount => _vehicles.where((v) => v.status == 'expired').length;
-  int get dueSoonCount => _vehicles.where((v) => v.status == 'soon').length;
-  int get validCount => _vehicles.where((v) => v.status == 'valid').length;
+  int get totalCount {
+    _cachedTotalCount ??= _vehicles.length;
+    return _cachedTotalCount!;
+  }
+
+  int get expiredCount {
+    _cachedExpiredCount ??= _vehicles.where((v) => v.status == 'expired').length;
+    return _cachedExpiredCount!;
+  }
+
+  int get dueSoonCount {
+    _cachedDueSoonCount ??= _vehicles.where((v) => v.status == 'soon').length;
+    return _cachedDueSoonCount!;
+  }
+
+  int get validCount {
+    _cachedValidCount ??= _vehicles.where((v) => v.status == 'valid').length;
+    return _cachedValidCount!;
+  }
 
   int get busCount => _vehicles.where((v) => v.type == 'bus').length;
   int get truckCount => _vehicles.where((v) => v.type == 'truck').length;
@@ -72,22 +106,29 @@ class VehicleProvider extends ChangeNotifier {
 
   void setSearchQuery(String query) {
     _searchQuery = query;
+    _invalidateCache();
     notifyListeners();
   }
 
   void setFilter(VehicleFilter filter) {
     _filter = filter;
+    _invalidateCache();
     notifyListeners();
   }
 
   void setSortBy(String sort) {
     _sortBy = sort;
+    _invalidateCache();
     notifyListeners();
   }
 
   Future<void> load() async {
     _vehicles = await _db.getAll();
-    await NotificationService.scheduleVehicleNotifications(_vehicles);
+    _invalidateCache();
+    // Schedule notifications on next frame to avoid blocking
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      NotificationService.scheduleVehicleNotifications(_vehicles);
+    });
     notifyListeners();
   }
 
@@ -95,7 +136,11 @@ class VehicleProvider extends ChangeNotifier {
     final id = await _db.insert(vehicle);
     final newVehicle = vehicle.copyWith(id: id);
     _vehicles.add(newVehicle);
-    await NotificationService.scheduleVehicleNotifications(_vehicles);
+    _invalidateCache();
+    // Schedule notifications on next frame
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      NotificationService.scheduleVehicleNotifications(_vehicles);
+    });
     notifyListeners();
   }
 
@@ -105,14 +150,22 @@ class VehicleProvider extends ChangeNotifier {
     if (index != -1) {
       _vehicles[index] = vehicle;
     }
-    await NotificationService.scheduleVehicleNotifications(_vehicles);
+    _invalidateCache();
+    // Schedule notifications on next frame
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      NotificationService.scheduleVehicleNotifications(_vehicles);
+    });
     notifyListeners();
   }
 
   Future<void> deleteVehicle(int id) async {
     await _db.delete(id);
     _vehicles.removeWhere((v) => v.id == id);
-    await NotificationService.scheduleVehicleNotifications(_vehicles);
+    _invalidateCache();
+    // Schedule notifications on next frame
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      NotificationService.scheduleVehicleNotifications(_vehicles);
+    });
     notifyListeners();
   }
 

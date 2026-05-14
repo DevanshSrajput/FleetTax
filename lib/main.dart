@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/vehicle_provider.dart';
-import 'screens/dashboard_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/notification_service.dart';
 
 void main() async {
@@ -21,7 +21,6 @@ class FleetTaxApp extends StatelessWidget {
     const secondaryColor = Color(0xFFFF6B35); // Bold orange
     const accentColor = Color(0xFF00D9FF); // Bold cyan
     const errorColor = Color(0xFFFF0044); // Bold red
-    const successColor = Color(0xFF00E676); // Bold green
     const backgroundColor = Color(0xFFF5F5F5); // Light gray
     const surfaceColor = Color(0xFFFFFFFF); // White
     const blackColor = Color(0xFF000000); // Pure black
@@ -269,7 +268,7 @@ class FleetTaxApp extends StatelessWidget {
             labelSmall: TextStyle(fontWeight: FontWeight.w700, color: blackColor),
           ),
         ),
-        home: const DashboardScreen(),
+        home: const SplashScreen(),
       ),
     );
   }

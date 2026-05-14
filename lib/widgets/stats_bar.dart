@@ -7,10 +7,6 @@ class StatsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Neo-brutalism colors
-    const black = Color(0xFF000000);
-    const borderWidth = 3.0;
-
     return Consumer<VehicleProvider>(
       builder: (context, provider, child) {
         return Container(

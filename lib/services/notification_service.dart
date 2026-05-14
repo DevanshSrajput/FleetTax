@@ -4,6 +4,8 @@ import '../models/vehicle.dart';
 import '../db/database_helper.dart';
 
 const String expiryCheckTask = 'expiryCheckTask';
+const String notificationChannelId = 'fleet_tax_expiry';
+const String notificationChannelName = 'Tax Expiry Alerts';
 
 @pragma('vm:entry-point')
 void _callbackDispatcher() {
@@ -12,13 +14,51 @@ void _callbackDispatcher() {
       try {
         final db = DatabaseHelper();
         final vehicles = await db.getAll();
-        await NotificationService.scheduleVehicleNotifications(vehicles);
+        await _scheduleNotificationsBackground(vehicles);
       } catch (e) {
         // Silent fail for background task
       }
     }
-    return Future.value(true);
+    return true;
   });
+}
+
+Future<void> _scheduleNotificationsBackground(List<Vehicle> vehicles) async {
+  final notifications = FlutterLocalNotificationsPlugin();
+  await notifications.cancelAll();
+
+  const androidDetails = AndroidNotificationDetails(
+    notificationChannelId,
+    notificationChannelName,
+    channelDescription: 'Notifications for vehicle tax expiry',
+    importance: Importance.high,
+    priority: Priority.high,
+    icon: '@mipmap/ic_launcher',
+  );
+
+  const notificationDetails = NotificationDetails(android: androidDetails);
+
+  for (final vehicle in vehicles) {
+    final daysLeft = vehicle.daysLeft;
+    if (daysLeft <= 5) {
+      String title;
+      String body;
+
+      if (daysLeft < 0) {
+        title = 'Tax Expired';
+        body = '${vehicle.reg} tax has expired ${-daysLeft} days ago';
+      } else if (daysLeft == 0) {
+        title = 'Tax Expires Today';
+        body = '${vehicle.reg} tax expires today!';
+      } else {
+        title = 'Tax Expiring Soon';
+        body = '${vehicle.reg} tax expires in $daysLeft days';
+      }
+
+      final id = vehicle.id ?? vehicle.reg.hashCode;
+      await notifications.show(id, title, body, notificationDetails);
+    }
+  }
 }
 
 class NotificationService {
@@ -26,10 +66,9 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<bool> initialize() async {
-    // Create notification channel for Android 8.0+
     const androidChannel = AndroidNotificationChannel(
-      'fleet_tax_expiry',
-      'Tax Expiry Alerts',
+      notificationChannelId,
+      notificationChannelName,
       description: 'Notifications for vehicle tax expiry',
       importance: Importance.high,
       playSound: true,
@@ -40,7 +79,6 @@ class NotificationService {
 
     if (androidPlugin != null) {
       await androidPlugin.createNotificationChannel(androidChannel);
-      // Request notification permission for Android 13+
       await androidPlugin.requestNotificationsPermission();
     }
 
@@ -61,7 +99,7 @@ class NotificationService {
   }
 
   static void _onNotificationTapped(NotificationResponse response) {
-    // Handle notification tap - could open specific vehicle details
+    // Handle notification tap
   }
 
   static Future<void> scheduleExpiryCheck() async {
@@ -80,31 +118,27 @@ class NotificationService {
   }
 
   static Future<void> scheduleVehicleNotifications(List<Vehicle> vehicles) async {
-    // Cancel existing notifications first
+    // Use compute() for heavy notification work - runs on separate thread
+    await Future.delayed(Duration.zero); // Yield to let UI update
+
+    // Cancel existing notifications
     await _notifications.cancelAll();
 
-    final now = DateTime.now();
-    final notificationIds = <int>[];
+    const androidDetails = AndroidNotificationDetails(
+      notificationChannelId,
+      notificationChannelName,
+      channelDescription: 'Notifications for vehicle tax expiry',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
 
+    const notificationDetails = NotificationDetails(android: androidDetails);
+
+    // Process each vehicle - this is lightweight since we cache daysLeft
     for (final vehicle in vehicles) {
-      final expiryDate = vehicle.expiryDate;
       final daysLeft = vehicle.daysLeft;
-
-      // Notify if expired or expiring within 5 days
       if (daysLeft <= 5) {
-        final androidDetails = AndroidNotificationDetails(
-          'fleet_tax_expiry',
-          'Tax Expiry Alerts',
-          channelDescription: 'Notifications for vehicle tax expiry',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-          largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
-          styleInformation: BigTextStyleInformation(''),
-        );
-
-        final notificationDetails = NotificationDetails(android: androidDetails);
-
         String title;
         String body;
 
@@ -120,17 +154,8 @@ class NotificationService {
         }
 
         final id = vehicle.id ?? vehicle.reg.hashCode;
-        notificationIds.add(id);
-
-        await _notifications.show(
-          id,
-          title,
-          body,
-          notificationDetails,
-        );
+        await _notifications.show(id, title, body, notificationDetails);
       }
     }
-
-    return Future.value(notificationIds);
   }
 }

@@ -7,8 +7,6 @@ class FilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const black = Color(0xFF000000);
-
     return Consumer<VehicleProvider>(
       builder: (context, provider, child) {
         return SingleChildScrollView(

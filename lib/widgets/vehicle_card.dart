@@ -94,7 +94,6 @@ class _VehicleCardState extends State<VehicleCard>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final statusColor = _getStatusColor();
     final dateFormat = DateFormat('dd MMM yyyy');
 
