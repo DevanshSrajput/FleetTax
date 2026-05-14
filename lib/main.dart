@@ -29,7 +29,7 @@ class FleetTaxApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => VehicleProvider()..load(),
       child: MaterialApp(
-        title: 'FleetTax',
+        title: 'Fleet Tax',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(

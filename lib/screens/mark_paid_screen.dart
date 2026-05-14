@@ -63,9 +63,7 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
             : _receiptRefController.text.trim(),
       );
 
-      Navigator.pop(context);
-      Navigator.pop(context);
-
+      // Show snackbar BEFORE popping, as context becomes invalid after pop
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Payment recorded successfully'),
@@ -73,6 +71,11 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
           backgroundColor: Color(0xFF00E676),
         ),
       );
+
+      // Wait a frame for snackbar to register, then pop
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context); // Pop to dashboard
+      });
     }
   }
 
