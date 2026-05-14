@@ -119,7 +119,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
         provider.addVehicle(newVehicle);
       }
 
-      Navigator.pop(context);
+      // Show snackbar BEFORE popping, as context becomes invalid after pop
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -131,6 +131,10 @@ class _AddEditScreenState extends State<AddEditScreen> {
           backgroundColor: const Color(0xFF00E676),
         ),
       );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
     }
   }
 
