@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FleetTax Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .docs-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .doc-section {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 3px solid var(--border-color);
+        }
+
+        .doc-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid var(--accent-yellow);
+            padding-bottom: 1rem;
+        }
+
+        .doc-section h3 {
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .code-block {
+            background-color: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .toc {
+            background-color: var(--bg-primary);
+            padding: 2rem;
+            border: 4px solid var(--accent-cyan);
+            margin: 2rem 0;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 0.5rem 0;
+        }
+
+        .toc a {
+            color: var(--accent-cyan);
+            text-decoration: underline;
+        }
+
+        .toc a:hover {
+            color: var(--accent-yellow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        table th, table td {
+            border: 2px solid var(--border-color);
+            padding: 1rem;
+            text-align: left;
+        }
+
+        table th {
+            background-color: var(--accent-yellow);
+            color: #000;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: var(--bg-secondary);
+        }
+
+        .back-to-top {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .back-to-top a {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border: 3px solid var(--border-color);
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-to-top a:hover {
+            background-color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            color: #000;
+        }
+
+        .feature-list {
+            list-style-position: inside;
+            margin: 1rem 0;
+        }
+
+        .feature-list li {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+        }
+
+        .feature-list strong {
+            color: var(--accent-yellow);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🚍</span>
+                    <span class="logo-text">FleetTax</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="index.html#tech">Tech Stack</a></li>
+                <li><a href="index.html#download">Download</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+                <li>
+                    <a href="https://github.com/DevanshSrajput/FleetTax" target="_blank" class="github-link" title="GitHub Repository">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                        </svg>
+                    </a>
+                </li>
+                <li>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Documentation Content -->
+    <div class="docs-container">
+        <h1>FleetTax Documentation</h1>
+        <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem;">
+            Complete technical documentation for the FleetTax Vahan road tax tracker application.
+        </p>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">Project Overview</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#tech-stack">Technology Stack</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#database">Database Schema</a></li>
+                <li><a href="#installation">Installation Guide</a></li>
+                <li><a href="#building">Building for Production</a></li>
+                <li><a href="#notifications">Notification System</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li><a href="#api">API Reference</a></li>
+            </ul>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview" class="doc-section">
+            <h2>📖 Project Overview</h2>
+            <p>
+                <strong>FleetTax</strong> is a fully offline Android application built with Flutter that enables bus and truck fleet owners to efficiently track Vahan road tax payment deadlines. The app eliminates manual tracking by automatically calculating tax expiry dates, sending daily push notifications, and providing direct integration with the Vahan portal.
+            </p>
+            <h3>Key Objectives</h3>
+            <ul class="feature-list">
+                <li><strong>Track Tax Deadlines:</strong> Manage multiple vehicles with zero cloud dependency</li>
+                <li><strong>Auto Calculation:</strong> Automatically calculate expiry dates based on tax payment periods</li>
+                <li><strong>Timely Notifications:</strong> Send push notifications to prevent missed payments</li>
+                <li><strong>Offline First:</strong> No internet required, all data stored locally</li>
+                <li><strong>Modern Architecture:</strong> Built with Flutter, Provider, and SQLite</li>
+            </ul>
+        </div>
+
+        <!-- Features Section -->
+        <div id="features" class="doc-section">
+            <h2>✨ Core Features</h2>
+            <h3>Vehicle Management</h3>
+            <ul class="feature-list">
+                <li><strong>Add Vehicle:</strong> Register new vehicles with all details</li>
+                <li><strong>Edit Vehicle:</strong> Modify any vehicle information</li>
+                <li><strong>Delete Vehicle:</strong> Remove vehicles with confirmation</li>
+                <li><strong>Local Storage:</strong> All data stored via SQLite</li>
+            </ul>
+
+            <h3>Dashboard & Tracking</h3>
+            <ul class="feature-list">
+                <li><strong>Statistics Bar:</strong> View total, expired, due soon, and valid vehicles</li>
+                <li><strong>Search:</strong> Find vehicles by registration number</li>
+                <li><strong>Filter:</strong> Filter by status or vehicle type</li>
+                <li><strong>Sort:</strong> Organize by expiry date, registration, or type</li>
+            </ul>
+
+            <h3>Notification System</h3>
+            <ul class="feature-list">
+                <li><strong>Daily Alerts:</strong> Push notifications from T-10 days until payment</li>
+                <li><strong>Background Execution:</strong> WorkManager for reliable delivery</li>
+                <li><strong>Smart Scheduling:</strong> Works even when app is closed</li>
+            </ul>
+
+            <h3>Status Color Coding</h3>
+            <table>
+                <tr>
+                    <th>Status</th>
+                    <th>Color</th>
+                    <th>Meaning</th>
+                </tr>
+                <tr>
+                    <td>Expired</td>
+                    <td style="background-color: #ff0044; color: white;">Red (#FF0044)</td>
+                    <td>Tax payment is overdue</td>
+                </tr>
+                <tr>
+                    <td>Due Soon</td>
+                    <td style="background-color: #ff6b35; color: white;">Orange (#FF6B35)</td>
+                    <td>Tax expires within 10 days</td>
+                </tr>
+                <tr>
+                    <td>Valid</td>
+                    <td style="background-color: #00e676; color: #000;">Green (#00E676)</td>
+                    <td>Tax payment is current</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Tech Stack Section -->
+        <div id="tech-stack" class="doc-section">
+            <h2>🛠️ Technology Stack</h2>
+            <h3>Frontend Framework</h3>
+            <p><strong>Flutter 3.x:</strong> Cross-platform mobile framework with native-like performance and hot reload</p>
+
+            <h3>Programming Language</h3>
+            <p><strong>Dart 3.x:</strong> Modern, statically-typed language with async/await support</p>
+
+            <h3>State Management</h3>
+            <p><strong>Provider:</strong> Lightweight, reactive state management with automatic UI rebuilds</p>
+
+            <h3>Database</h3>
+            <p><strong>SQLite:</strong> Embedded relational database with zero configuration</p>
+
+            <h3>Background Tasks</h3>
+            <p><strong>WorkManager:</strong> Reliable background job scheduling that survives app restart</p>
+
+            <h3>Additional Libraries</h3>
+            <ul class="feature-list">
+                <li><strong>flutter_local_notifications:</strong> Cross-platform push notifications</li>
+                <li><strong>intl:</strong> Date/time formatting and localization</li>
+                <li><strong>url_launcher:</strong> Open URLs and external apps</li>
+            </ul>
+        </div>
+
+        <!-- Architecture Section -->
+        <div id="architecture" class="doc-section">
+            <h2>🏗️ Architecture</h2>
+            <h3>Project Structure</h3>
+            <div class="code-block">
+lib/
+├── main.dart                      # App entry point
+├── models/
+│   └── vehicle.dart               # Vehicle data model
+├── db/
+│   └── database_helper.dart       # SQLite operations
+├── services/
+│   ├── notification_service.dart  # Push notifications
+│   └── workmanager_service.dart   # Background tasks
+├── providers/
+│   └── vehicle_provider.dart      # State management
+├── screens/
+│   ├── dashboard_screen.dart      # Main view
+│   ├── add_edit_screen.dart       # Form
+│   └── mark_paid_screen.dart      # Payment entry
+└── widgets/
+    ├── vehicle_card.dart          # Vehicle tile
+    ├── stats_bar.dart             # Statistics
+    └── filter_chips.dart          # Filters
+            </div>
+
+            <h3>Architectural Patterns</h3>
+            <ul class="feature-list">
+                <li><strong>MVVM:</strong> Model-View-ViewModel with Provider pattern</li>
+                <li><strong>Singleton:</strong> Single database connection throughout app</li>
+                <li><strong>Service Locator:</strong> Static methods for service access</li>
+            </ul>
+        </div>
+
+        <!-- Database Section -->
+        <div id="database" class="doc-section">
+            <h2>🗄️ Database Schema</h2>
+            <div class="code-block">
+CREATE TABLE vehicles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reg TEXT NOT NULL,
+    type TEXT NOT NULL,
+    tax_period TEXT NOT NULL,
+    last_paid TEXT NOT NULL,
+    notes TEXT,
+    receipt_ref TEXT,
+    created_at TEXT NOT NULL
+);
+            </div>
+
+            <h3>Column Descriptions</h3>
+            <table>
+                <tr>
+                    <th>Column</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>INTEGER</td>
+                    <td>Primary key, auto-incrementing</td>
+                </tr>
+                <tr>
+                    <td>reg</td>
+                    <td>TEXT</td>
+                    <td>Vehicle registration number</td>
+                </tr>
+                <tr>
+                    <td>type</td>
+                    <td>TEXT</td>
+                    <td>'bus' or 'truck'</td>
+                </tr>
+                <tr>
+                    <td>tax_period</td>
+                    <td>TEXT</td>
+                    <td>'monthly', 'quarterly', or 'yearly'</td>
+                </tr>
+                <tr>
+                    <td>last_paid</td>
+                    <td>TEXT</td>
+                    <td>ISO 8601 date (YYYY-MM-DD)</td>
+                </tr>
+                <tr>
+                    <td>notes</td>
+                    <td>TEXT</td>
+                    <td>Optional notes</td>
+                </tr>
+                <tr>
+                    <td>receipt_ref</td>
+                    <td>TEXT</td>
+                    <td>Optional receipt reference</td>
+                </tr>
+                <tr>
+                    <td>created_at</td>
+                    <td>TEXT</td>
+                    <td>Creation timestamp</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Installation Section -->
+        <div id="installation" class="doc-section">
+            <h2>🚀 Installation Guide</h2>
+            <h3>Prerequisites</h3>
+            <ul class="feature-list">
+                <li><strong>Flutter SDK:</strong> Version 3.11.5 or later</li>
+                <li><strong>Android Studio:</strong> Latest version with Android SDK 33+</li>
+                <li><strong>Android Device/Emulator:</strong> API 33 (Android 13) or higher</li>
+                <li><strong>Git:</strong> For cloning the repository</li>
+            </ul>
+
+            <h3>Step 1: Clone Repository</h3>
+            <div class="code-block">
+git clone https://github.com/DevanshSrajput/FleetTax.git
+cd FleetTax
+            </div>
+
+            <h3>Step 2: Install Dependencies</h3>
+            <div class="code-block">
+flutter pub get
+            </div>
+
+            <h3>Step 3: Verify Setup</h3>
+            <div class="code-block">
+flutter doctor
+            </div>
+
+            <h3>Step 4: Run Application</h3>
+            <div class="code-block">
+# List available devices
+flutter devices
+
+# Run on specific device
+flutter run -d &lt;device-id&gt;
+            </div>
+        </div>
+
+        <!-- Building Section -->
+        <div id="building" class="doc-section">
+            <h2>📦 Building for Production</h2>
+            <h3>Release APK Build</h3>
+            <div class="code-block">
+flutter build apk --release
+            </div>
+            <p>Output: <code>build/app/outputs/flutter-apk/app-release.apk</code></p>
+
+            <h3>Android Permissions</h3>
+            <p>Ensure <code>android/app/src/main/AndroidManifest.xml</code> includes:</p>
+            <div class="code-block">
+&lt;uses-permission android:name="android.permission.POST_NOTIFICATIONS"/&gt;
+&lt;uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/&gt;
+&lt;uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/&gt;
+&lt;uses-permission android:name="android.permission.INTERNET"/&gt;
+            </div>
+        </div>
+
+        <!-- Notifications Section -->
+        <div id="notifications" class="doc-section">
+            <h2>🔔 Notification System</h2>
+            <h3>How It Works</h3>
+            <ol style="margin-left: 1rem;">
+                <li>App initializes NotificationService on launch</li>
+                <li>WorkManager registers a daily background task</li>
+                <li>Every 24 hours, the system checks all vehicles</li>
+                <li>If daysLeft ≤ 10, a notification is triggered</li>
+                <li>Process continues until vehicle is marked as paid</li>
+            </ol>
+
+            <h3>Notification Permissions (Android 13+)</h3>
+            <ul class="feature-list">
+                <li>Runtime permission requested on first launch</li>
+                <li>Users must enable in Settings → Apps → FleetTax → Notifications</li>
+                <li>On manufacturer phones, allow background activity in battery settings</li>
+            </ul>
+        </div>
+
+        <!-- Troubleshooting Section -->
+        <div id="troubleshooting" class="doc-section">
+            <h2>🐛 Troubleshooting</h2>
+
+            <h3>Notifications Not Showing</h3>
+            <p><strong>Cause:</strong> Permission not granted at runtime</p>
+            <p><strong>Solution:</strong> Go to Settings → Apps → FleetTax → Enable Notifications</p>
+
+            <h3>WorkManager Not Firing</h3>
+            <p><strong>Cause:</strong> Android power management killing background tasks</p>
+            <p><strong>Solution:</strong> Allow background activity in battery settings for FleetTax</p>
+
+            <h3>SDK Not Found</h3>
+            <p><strong>Solution:</strong> Run <code>flutter doctor</code> and follow recommendations</p>
+
+            <h3>MissingPluginException</h3>
+            <div class="code-block">
+flutter clean
+flutter pub get
+flutter run
+            </div>
+
+            <h3>App Crashes on Launch</h3>
+            <p><strong>Solution:</strong> Check <code>flutter logs</code> for full error trace</p>
+        </div>
+
+        <!-- API Reference Section -->
+        <div id="api" class="doc-section">
+            <h2>📚 API Reference</h2>
+
+            <h3>Vehicle Class</h3>
+            <h4>Key Methods</h4>
+            <ul class="feature-list">
+                <li><strong>expiryDate:</strong> DateTime getter for calculated tax expiry</li>
+                <li><strong>daysLeft:</strong> int getter for days remaining (negative if expired)</li>
+                <li><strong>status:</strong> String getter returning 'expired', 'soon', or 'valid'</li>
+            </ul>
+
+            <h3>VehicleProvider</h3>
+            <h4>Key Methods</h4>
+            <ul class="feature-list">
+                <li><strong>load():</strong> Load all vehicles from database</li>
+                <li><strong>add(Vehicle v):</strong> Insert new vehicle</li>
+                <li><strong>update(Vehicle v):</strong> Update existing vehicle</li>
+                <li><strong>delete(int id):</strong> Delete vehicle by ID</li>
+                <li><strong>markPaid():</strong> Log payment and reschedule notifications</li>
+            </ul>
+
+            <h3>DatabaseHelper</h3>
+            <h4>Key Methods</h4>
+            <ul class="feature-list">
+                <li><strong>insert(Vehicle v):</strong> Add vehicle, returns ID</li>
+                <li><strong>update(Vehicle v):</strong> Update vehicle, returns rows affected</li>
+                <li><strong>delete(int id):</strong> Delete vehicle, returns rows affected</li>
+                <li><strong>getAll():</strong> Get all vehicles from database</li>
+            </ul>
+        </div>
+
+        <!-- Roadmap Section -->
+        <div id="roadmap" class="doc-section">
+            <h2>🗺️ Roadmap</h2>
+            <h3>Version 1.0 (Current) ✅</h3>
+            <ul class="feature-list">
+                <li><strong>✓ Vehicle CRUD</strong> - Add, edit, delete vehicles</li>
+                <li><strong>✓ Tax Calculation</strong> - Monthly, quarterly, yearly periods</li>
+                <li><strong>✓ Dashboard</strong> - Color-coded status cards</li>
+                <li><strong>✓ Search & Filter</strong> - Find and organize vehicles</li>
+                <li><strong>✓ Notifications</strong> - Daily push alerts</li>
+                <li><strong>✓ Vahan Integration</strong> - Direct portal access</li>
+                <li><strong>✓ Offline Mode</strong> - Complete offline operation</li>
+            </ul>
+
+            <h3>Version 2.0 (Planned)</h3>
+            <ul class="feature-list">
+                <li>Insurance expiry tracking</li>
+                <li>Fitness certificate (FC) tracking</li>
+                <li>Google Drive backup and restore</li>
+                <li>PDF receipt capture</li>
+                <li>Multi-owner and driver assignment</li>
+                <li>Play Store release</li>
+            </ul>
+        </div>
+
+        <!-- Download LaTeX -->
+        <div class="back-to-top">
+            <a href="fleettax_documentation.tex" download>📄 Download Full LaTeX Documentation</a>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="back-to-top">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 4rem;">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>FleetTax</h4>
+                    <p>Vahan road tax tracker for fleet owners in India</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Developer</h4>
+                    <ul>
+                        <li><a href="https://github.com/DevanshSrajput">Devansh Singh</a></li>
+                        <li><a href="https://devanshsingh.dev">Portfolio</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Links</h4>
+                    <ul>
+                        <li><a href="https://github.com/DevanshSrajput/FleetTax">GitHub</a></li>
+                        <li><a href="index.html">Home</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Devansh Singh. Made with ❤️ for Indian fleet owners.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
