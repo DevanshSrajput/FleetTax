@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../models/vehicle.dart';
 import '../db/database_helper.dart';
-import '../services/notification_service.dart';
 
 enum VehicleFilter { all, expired, soon, valid, bus, truck }
 
@@ -10,21 +9,19 @@ class VehicleProvider extends ChangeNotifier {
   List<Vehicle> _vehicles = [];
   String _searchQuery = '';
   VehicleFilter _filter = VehicleFilter.all;
-  String _sortBy = 'expiry'; // 'expiry', 'reg', 'type'
+  String _sortBy = 'expiry';
 
   List<Vehicle> get vehicles => _getFilteredVehicles();
 
   List<Vehicle> _getFilteredVehicles() {
     List<Vehicle> result = List.from(_vehicles);
 
-    // Apply search filter
     if (_searchQuery.isNotEmpty) {
       result = result
           .where((v) => v.reg.toLowerCase().contains(_searchQuery.toLowerCase()))
           .toList();
     }
 
-    // Apply status/type filter
     switch (_filter) {
       case VehicleFilter.expired:
         result = result.where((v) => v.status == 'expired').toList();
@@ -45,7 +42,6 @@ class VehicleProvider extends ChangeNotifier {
         break;
     }
 
-    // Apply sorting
     switch (_sortBy) {
       case 'expiry':
         result.sort((a, b) => a.daysLeft.compareTo(b.daysLeft));
@@ -61,10 +57,8 @@ class VehicleProvider extends ChangeNotifier {
     return result;
   }
 
-  // Stats
   int get totalCount => _vehicles.length;
-  int get expiredCount =>
-      _vehicles.where((v) => v.status == 'expired').length;
+  int get expiredCount => _vehicles.where((v) => v.status == 'expired').length;
   int get dueSoonCount => _vehicles.where((v) => v.status == 'soon').length;
   int get validCount => _vehicles.where((v) => v.status == 'valid').length;
 
@@ -92,7 +86,6 @@ class VehicleProvider extends ChangeNotifier {
 
   Future<void> load() async {
     _vehicles = await _db.getAll();
-    await _checkAndNotify();
     notifyListeners();
   }
 
@@ -100,7 +93,6 @@ class VehicleProvider extends ChangeNotifier {
     final id = await _db.insert(vehicle);
     final newVehicle = vehicle.copyWith(id: id);
     _vehicles.add(newVehicle);
-    await _checkAndNotify();
     notifyListeners();
   }
 
@@ -110,14 +102,12 @@ class VehicleProvider extends ChangeNotifier {
     if (index != -1) {
       _vehicles[index] = vehicle;
     }
-    await _checkAndNotify();
     notifyListeners();
   }
 
   Future<void> deleteVehicle(int id) async {
     await _db.delete(id);
     _vehicles.removeWhere((v) => v.id == id);
-    await NotificationService.cancel(id);
     notifyListeners();
   }
 
@@ -135,18 +125,6 @@ class VehicleProvider extends ChangeNotifier {
         receiptRef: receiptRef,
       );
       await updateVehicle(updatedVehicle);
-    }
-  }
-
-  Future<void> _checkAndNotify() async {
-    for (final vehicle in _vehicles) {
-      if (vehicle.id != null && vehicle.daysLeft <= 10) {
-        await NotificationService.showAlert(
-          vehicle.id!,
-          vehicle.reg,
-          vehicle.daysLeft,
-        );
-      }
     }
   }
 

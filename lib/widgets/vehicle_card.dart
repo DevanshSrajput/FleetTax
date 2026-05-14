@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/vehicle.dart';
 
-class VehicleCard extends StatelessWidget {
+class VehicleCard extends StatefulWidget {
   final Vehicle vehicle;
   final VoidCallback onMarkPaid;
   final VoidCallback onEdit;
@@ -16,29 +16,57 @@ class VehicleCard extends StatelessWidget {
     required this.onDelete,
   });
 
+  @override
+  State<VehicleCard> createState() => _VehicleCardState();
+}
+
+class _VehicleCardState extends State<VehicleCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.98).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Color _getStatusColor() {
-    if (vehicle.daysLeft < 0) return Colors.red;
-    if (vehicle.daysLeft <= 10) return Colors.amber;
-    return Colors.green;
+    if (widget.vehicle.daysLeft < 0) return const Color(0xFFBA1A1A);
+    if (widget.vehicle.daysLeft <= 10) return const Color(0xFF8B5E00);
+    return const Color(0xFF1B8B47);
   }
 
   String _getStatusText() {
-    if (vehicle.daysLeft < 0) {
-      return 'Expired ${vehicle.daysLeft.abs()} days ago';
-    } else if (vehicle.daysLeft == 0) {
+    final daysLeft = widget.vehicle.daysLeft;
+    if (daysLeft < 0) {
+      return 'Expired ${daysLeft.abs()} days ago';
+    } else if (daysLeft == 0) {
       return 'Expires today!';
-    } else if (vehicle.daysLeft == 1) {
+    } else if (daysLeft == 1) {
       return 'Expires tomorrow';
-    } else if (vehicle.daysLeft <= 10) {
-      return 'Due in ${vehicle.daysLeft} days';
+    } else if (daysLeft <= 10) {
+      return 'Due in $daysLeft days';
     } else {
-      return 'Valid ${vehicle.daysLeft} days';
+      return 'Valid $daysLeft days';
     }
   }
 
   String _getExpiryText(DateFormat dateFormat) {
-    final expiryFormatted = dateFormat.format(vehicle.expiryDate);
-    if (vehicle.daysLeft < 0) {
+    final expiryFormatted = dateFormat.format(widget.vehicle.expiryDate);
+    if (widget.vehicle.daysLeft < 0) {
       return 'Expired on $expiryFormatted';
     } else {
       return 'Expires: $expiryFormatted';
@@ -46,11 +74,13 @@ class VehicleCard extends StatelessWidget {
   }
 
   IconData _getVehicleIcon() {
-    return vehicle.type == 'bus' ? Icons.directions_bus : Icons.local_shipping;
+    return widget.vehicle.type == 'bus'
+        ? Icons.directions_bus
+        : Icons.local_shipping;
   }
 
   String _getTaxPeriodLabel() {
-    switch (vehicle.taxPeriod) {
+    switch (widget.vehicle.taxPeriod) {
       case 'monthly':
         return 'Monthly';
       case 'quarterly':
@@ -58,189 +88,245 @@ class VehicleCard extends StatelessWidget {
       case 'yearly':
         return 'Yearly';
       default:
-        return vehicle.taxPeriod;
+        return widget.vehicle.taxPeriod;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final statusColor = _getStatusColor();
     final dateFormat = DateFormat('dd MMM yyyy');
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(color: statusColor, width: 5),
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: child,
+        );
+      },
+      child: GestureDetector(
+        onTapDown: (_) => _controller.forward(),
+        onTapUp: (_) => _controller.reverse(),
+        onTapCancel: () => _controller.reverse(),
+        child: Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          elevation: 1,
+          shadowColor: Colors.black12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        child: Column(
-          children: [
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border(
+                left: BorderSide(color: statusColor, width: 5),
               ),
-              leading: CircleAvatar(
-                backgroundColor: statusColor.withOpacity(0.15),
-                child: Icon(
-                  _getVehicleIcon(),
-                  color: statusColor,
-                ),
-              ),
-              title: Text(
-                vehicle.reg.toUpperCase(),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  letterSpacing: 1,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 4),
-                  Row(
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
                     children: [
-                      _buildInfoChip(
-                        icon: vehicle.type == 'bus'
-                            ? Icons.directions_bus
-                            : Icons.local_shipping,
-                        label: vehicle.type.toUpperCase(),
+                      // Status indicator avatar
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          _getVehicleIcon(),
+                          color: statusColor,
+                          size: 24,
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      _buildInfoChip(
-                        icon: Icons.calendar_today,
-                        label: _getTaxPeriodLabel(),
+                      const SizedBox(width: 12),
+                      // Vehicle info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.vehicle.reg.toUpperCase(),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                _buildInfoChip(
+                                  context: context,
+                                  icon: widget.vehicle.type == 'bus'
+                                      ? Icons.directions_bus
+                                      : Icons.local_shipping,
+                                  label: widget.vehicle.type.toUpperCase(),
+                                ),
+                                const SizedBox(width: 12),
+                                _buildInfoChip(
+                                  context: context,
+                                  icon: Icons.calendar_month,
+                                  label: _getTaxPeriodLabel(),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Last paid: ${dateFormat.format(DateTime.parse(widget.vehicle.lastPaid))}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _getExpiryText(dateFormat),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: statusColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Status badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          _getStatusText(),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: statusColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Last paid: ${dateFormat.format(DateTime.parse(vehicle.lastPaid))}',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
+                ),
+                // Notes section
+                if (widget.vehicle.notes != null &&
+                    widget.vehicle.notes!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.vehicle.notes!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _getExpiryText(dateFormat),
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                if (widget.vehicle.receiptRef != null &&
+                    widget.vehicle.receiptRef!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Receipt: ${widget.vehicle.receiptRef}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ),
                   ),
-                ],
-              ),
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: statusColor.withOpacity(0.5)),
-                ),
-                child: Text(
-                  _getStatusText(),
-                  style: TextStyle(
-                    color: statusColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 11,
+                // Action buttons
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      FilledButton.tonalIcon(
+                        onPressed: widget.onMarkPaid,
+                        icon: const Icon(Icons.payments, size: 18),
+                        label: const Text('Mark Paid'),
+                        style: FilledButton.styleFrom(
+                          foregroundColor: const Color(0xFF1B8B47),
+                          backgroundColor: const Color(0xFF1B8B47).withValues(alpha: 0.1),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      TextButton(
+                        onPressed: widget.onEdit,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.edit, size: 18),
+                            SizedBox(width: 4),
+                            Text('Edit'),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: widget.onDelete,
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFFBA1A1A),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.delete, size: 18),
+                            SizedBox(width: 4),
+                            Text('Delete'),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+              ],
             ),
-            if (vehicle.notes != null && vehicle.notes!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    vehicle.notes!,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            if (vehicle.receiptRef != null && vehicle.receiptRef!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Receipt: ${vehicle.receiptRef}',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: onMarkPaid,
-                    icon: const Icon(Icons.payments, size: 18),
-                    label: const Text('Mark Paid'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.green,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  TextButton.icon(
-                    onPressed: onEdit,
-                    icon: const Icon(Icons.edit, size: 18),
-                    label: const Text('Edit'),
-                  ),
-                  const SizedBox(width: 4),
-                  TextButton.icon(
-                    onPressed: onDelete,
-                    icon: const Icon(Icons.delete, size: 18),
-                    label: const Text('Delete'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildInfoChip({required IconData icon, required String label}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 12, color: Colors.grey[600]),
-        const SizedBox(width: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.grey[600],
+  Widget _buildInfoChip({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+  }) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

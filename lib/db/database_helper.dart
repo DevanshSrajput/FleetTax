@@ -20,7 +20,7 @@ class DatabaseHelper {
     final String path = join(await getDatabasesPath(), 'fleettax.db');
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE vehicles(
@@ -31,9 +31,23 @@ class DatabaseHelper {
             last_paid TEXT NOT NULL,
             notes TEXT,
             receipt_ref TEXT,
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            permit_expiry TEXT
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          final result = await db.rawQuery(
+            "PRAGMA table_info(vehicles)",
+          );
+          final columns = result.map((r) => r['name'] as String).toList();
+          if (!columns.contains('permit_expiry')) {
+            await db.execute(
+              'ALTER TABLE vehicles ADD COLUMN permit_expiry TEXT',
+            );
+          }
+        }
       },
     );
   }

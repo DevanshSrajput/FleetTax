@@ -64,12 +64,13 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
       );
 
       Navigator.pop(context);
-      Navigator.pop(context); // Also pop the dashboard to refresh
+      Navigator.pop(context);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Payment recorded successfully'),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: const Text('Payment recorded successfully'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: const Color(0xFF1B8B47),
         ),
       );
     }
@@ -77,6 +78,7 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final dateFormat = DateFormat('dd MMM yyyy');
     final provider = context.read<VehicleProvider>();
     final vehicle = provider.getVehicleById(widget.vehicleId);
@@ -84,64 +86,126 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mark as Paid'),
+        centerTitle: true,
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           children: [
             if (vehicle != null) ...[
               Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    child: Icon(
-                      vehicle.type == 'bus'
-                          ? Icons.directions_bus
-                          : Icons.local_shipping,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  title: Text(
-                    vehicle.reg.toUpperCase(),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    '${vehicle.type.toUpperCase()} - ${vehicle.taxPeriod}',
+                elevation: 0,
+                color: theme.colorScheme.surfaceContainerLow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          vehicle.type == 'bus'
+                              ? Icons.directions_bus
+                              : Icons.local_shipping,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              vehicle.reg.toUpperCase(),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${vehicle.type.toUpperCase()} - ${vehicle.taxPeriod}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
             ],
 
             // Payment Date
-            InkWell(
-              onTap: _selectDate,
-              child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Payment Date',
-                  prefixIcon: Icon(Icons.event),
-                  border: OutlineInputBorder(),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(dateFormat.format(_paymentDate)),
-                    const Icon(Icons.arrow_drop_down),
-                  ],
+            Card(
+              elevation: 0,
+              color: theme.colorScheme.surfaceContainerLow,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: InkWell(
+                onTap: _selectDate,
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.event,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Payment Date',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              dateFormat.format(_paymentDate),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
             // Tax Period
             DropdownButtonFormField<String>(
-              value: _selectedTaxPeriod,
-              decoration: const InputDecoration(
+              initialValue: _selectedTaxPeriod,
+              decoration: InputDecoration(
                 labelText: 'Tax Period',
-                prefixIcon: Icon(Icons.calendar_month),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.calendar_month),
+                filled: true,
+                fillColor: theme.colorScheme.surfaceContainerLow,
               ),
               items: const [
                 DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
@@ -156,38 +220,42 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
                 }
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
             // Receipt Reference
             TextFormField(
               controller: _receiptRefController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Receipt Reference (optional)',
                 hintText: 'e.g., RECPT-2025-001234',
-                prefixIcon: Icon(Icons.receipt),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.receipt),
+                filled: true,
+                fillColor: theme.colorScheme.surfaceContainerLow,
               ),
             ),
             const SizedBox(height: 24),
 
             // Info Card
             Card(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              elevation: 0,
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     Icon(
                       Icons.info_outline,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: theme.colorScheme.primary,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'The expiry date will be recalculated based on the payment date and tax period.',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 13,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -195,7 +263,7 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
             // Mark Paid Button
             FilledButton.icon(
@@ -204,6 +272,7 @@ class _MarkPaidScreenState extends State<MarkPaidScreen> {
               label: const Text('Confirm Payment'),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
+                minimumSize: const Size(double.infinity, 52),
               ),
             ),
           ],
