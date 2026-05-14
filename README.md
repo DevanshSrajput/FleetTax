@@ -113,7 +113,7 @@ CREATE TABLE vehicles (
 
 ### Prerequisites
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) ≥ 3.11
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) ≥ 3.11.5 (as defined in `pubspec.yaml`; latest stable recommended)
 - [Android Studio](https://developer.android.com/studio) with Android SDK 33+ installed
 - A physical Android device **or** an Android emulator (API 33 recommended)
 
@@ -167,9 +167,12 @@ FleetTax uses **WorkManager** to schedule a daily background check. For notifica
 ### Required Android permissions (`AndroidManifest.xml`)
 
 ```xml
+<!-- Notifications & background checks -->
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
+<!-- Required only for the Vahan portal quick-launch feature (url_launcher) -->
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
 
