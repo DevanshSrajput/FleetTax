@@ -31,7 +31,7 @@ if (tickerTrack) {
 }
 
 const revealTargets = document.querySelectorAll(
-  ".feature-tile, .workflow-grid article, .tech-grid article, .download-card"
+  ".feature-tile, .workflow-grid article, .tech-grid article, .download-card, .doc-panel, .resource-card"
 );
 
 const revealObserver = new IntersectionObserver(
@@ -52,15 +52,17 @@ revealTargets.forEach((target) => {
 });
 
 const sectionLinks = [...document.querySelectorAll(".site-nav a[href^='#']")];
+const docLinks = [...document.querySelectorAll(".docs-toc a[href^='#']")];
 const sections = sectionLinks
+  .concat(docLinks)
   .map((link) => document.querySelector(link.getAttribute("href")))
-  .filter(Boolean);
+  .filter((section, index, list) => section && list.indexOf(section) === index);
 
 const navObserver = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      sectionLinks.forEach((link) => {
+      [...sectionLinks, ...docLinks].forEach((link) => {
         link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`);
       });
     });
