@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="FleetTax technical documentation, architecture, setup, data model, notification flow, and release resources."
+    />
+    <title>FleetTax Documentation</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="FleetTax home">
+        <span class="brand-mark" aria-hidden="true">
+          <img src="FleetTax.png" alt="" />
+        </span>
+        <span>
+          <strong>FleetTax</strong>
+          <small>Documentation</small>
+        </span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-label="Open navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="site-nav" aria-label="Documentation navigation">
+        <a href="index.html#overview">Overview</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#data-model">Data</a>
+        <a href="#setup">Setup</a>
+        <a href="#release">Release</a>
+      </nav>
+
+      <div class="header-actions">
+        <a
+          class="icon-button"
+          href="https://github.com/DevanshSrajput/FleetTax"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Open FleetTax on GitHub"
+          title="GitHub"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.04c-3.34.73-4.04-1.42-4.04-1.42-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.85 1.24 1.85 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.92 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.6-2.81 5.62-5.49 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .5Z"
+            />
+          </svg>
+        </a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme">
+          <span class="sun" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <main class="docs-page">
+      <section class="docs-hero">
+        <div>
+          <p class="eyebrow">Technical guide</p>
+          <h1>FleetTax Docs</h1>
+          <p>
+            A practical reference for the offline Android app: architecture,
+            data flow, notification behavior, setup, build steps, and release
+            resources.
+          </p>
+        </div>
+        <aside class="resource-card" aria-label="Documentation resources">
+          <span class="release-label">Resources</span>
+          <strong>Version 1.0.0</strong>
+          <a class="button primary" href="FleetTax_Documentation.pdf">Open PDF</a>
+          <a class="button secondary" href="fleettax_documentation.tex" download>Download LaTeX</a>
+        </aside>
+      </section>
+
+      <section class="docs-layout">
+        <aside class="docs-toc" aria-label="Table of contents">
+          <strong>Contents</strong>
+          <a href="#product">Product</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#data-model">Data Model</a>
+          <a href="#notifications">Notifications</a>
+          <a href="#setup">Setup</a>
+          <a href="#release">Build & Release</a>
+          <a href="#troubleshooting">Troubleshooting</a>
+        </aside>
+
+        <div class="docs-content">
+          <section class="doc-panel" id="product">
+            <p class="panel-kicker">Product</p>
+            <h2>What FleetTax does</h2>
+            <p>
+              FleetTax helps Indian bus and truck fleet owners track Vahan road
+              tax deadlines without depending on cloud sync. Operators can add
+              vehicles, choose the tax period, view the calculated expiry state,
+              receive local reminders, open the Vahan portal, and record payment
+              references after renewal.
+            </p>
+            <div class="doc-grid three">
+              <article>
+                <span>01</span>
+                <strong>Offline records</strong>
+                <p>SQLite keeps vehicle data on the device for fast access.</p>
+              </article>
+              <article>
+                <span>02</span>
+                <strong>Expiry logic</strong>
+                <p>Monthly, quarterly, and yearly periods calculate status automatically.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <strong>Payment loop</strong>
+                <p>Open Vahan, pay tax, then log date, period, and receipt reference.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="doc-panel" id="architecture">
+            <p class="panel-kicker">Architecture</p>
+            <h2>Application structure</h2>
+            <p>
+              The app follows a clear Flutter structure: models hold business
+              rules, the database helper owns persistence, services handle
+              platform concerns, providers coordinate state, and screens/widgets
+              render the user workflow.
+            </p>
+            <pre><code>lib/
+  main.dart
+  models/vehicle.dart
+  db/database_helper.dart
+  providers/vehicle_provider.dart
+  services/notification_service.dart
+  screens/dashboard_screen.dart
+  screens/add_edit_screen.dart
+  screens/mark_paid_screen.dart
+  widgets/vehicle_card.dart
+  widgets/stats_bar.dart
+  widgets/filter_chips.dart</code></pre>
+            <div class="flow-row">
+              <span>Vehicle input</span>
+              <span>Provider state</span>
+              <span>SQLite storage</span>
+              <span>Status dashboard</span>
+            </div>
+          </section>
+
+          <section class="doc-panel" id="data-model">
+            <p class="panel-kicker">Persistence</p>
+            <h2>Vehicle data model</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Field</th>
+                    <th>Purpose</th>
+                    <th>Example</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>reg</code></td>
+                    <td>Vehicle registration number</td>
+                    <td><code>DL01AB1234</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>type</code></td>
+                    <td>Commercial vehicle class</td>
+                    <td><code>bus</code> or <code>truck</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>taxPeriod</code></td>
+                    <td>Validity period for the most recent payment</td>
+                    <td><code>monthly</code>, <code>quarterly</code>, <code>yearly</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>lastPaid</code></td>
+                    <td>Payment date used to calculate expiry</td>
+                    <td><code>2026-05-15</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>receiptRef</code></td>
+                    <td>Optional receipt or transaction reference</td>
+                    <td><code>VAHAN-2026-001</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="doc-panel" id="notifications">
+            <p class="panel-kicker">Reminders</p>
+            <h2>Notification behavior</h2>
+            <p>
+              FleetTax uses WorkManager for periodic background checks and
+              flutter_local_notifications for local alerts. Vehicles become
+              attention-worthy when they are expired or within the 10-day warning
+              window.
+            </p>
+            <ol class="doc-steps">
+              <li>Load saved vehicles from SQLite.</li>
+              <li>Calculate each expiry date from <code>lastPaid + taxPeriod</code>.</li>
+              <li>Classify status as expired, due soon, or valid.</li>
+              <li>Show local notifications for expired and due-soon vehicles.</li>
+            </ol>
+          </section>
+
+          <section class="doc-panel" id="setup">
+            <p class="panel-kicker">Developer setup</p>
+            <h2>Run locally</h2>
+            <pre><code>flutter pub get
+flutter analyze
+flutter test
+flutter run</code></pre>
+            <p>
+              The project targets Flutter with Dart SDK 3.11.5 or newer and
+              Android 13+ behavior for notifications. Keep emulator or device
+              notification permissions enabled while validating reminders.
+            </p>
+          </section>
+
+          <section class="doc-panel" id="release">
+            <p class="panel-kicker">Release</p>
+            <h2>Build and distribute</h2>
+            <pre><code>flutter clean
+flutter pub get
+flutter build apk --release</code></pre>
+            <div class="doc-grid two">
+              <article>
+                <strong>APK output</strong>
+                <p><code>build/app/outputs/flutter-apk/app-release.apk</code></p>
+              </article>
+              <article>
+                <strong>Public release</strong>
+                <p>Attach the APK and PDF guide to the GitHub Releases page.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="doc-panel" id="troubleshooting">
+            <p class="panel-kicker">Support</p>
+            <h2>Troubleshooting checklist</h2>
+            <div class="issue-list">
+              <article>
+                <strong>Notifications do not appear</strong>
+                <p>Grant notification permission, verify WorkManager setup, and test on a real device when possible.</p>
+              </article>
+              <article>
+                <strong>Database data looks stale</strong>
+                <p>Hot restart the app, inspect SQLite migrations, and verify provider reload calls after writes.</p>
+              </article>
+              <article>
+                <strong>Vahan link does not open</strong>
+                <p>Run on a device with a browser installed and check url_launcher Android configuration.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>FleetTax</strong>
+        <p>Technical documentation for the Vahan road tax tracker.</p>
+      </div>
+      <nav aria-label="Footer navigation">
+        <a href="index.html">Landing page</a>
+        <a href="FleetTax_Documentation.pdf">PDF guide</a>
+        <a href="fleettax_documentation.tex" download>LaTeX source</a>
+      </nav>
+      <p class="credit">Copyright 2025 Devansh Singh. MIT licensed.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

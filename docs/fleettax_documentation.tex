@@ -1,0 +1,292 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\definecolor{FleetInk}{HTML}{17110F}
+\definecolor{FleetBlue}{HTML}{1E73FF}
+\definecolor{FleetCyan}{HTML}{3BE7DC}
+\definecolor{FleetYellow}{HTML}{FFE04B}
+\definecolor{FleetRed}{HTML}{F23D4C}
+\definecolor{FleetGreen}{HTML}{11B86F}
+\definecolor{FleetPaper}{HTML}{FFF8E8}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=FleetBlue,
+  urlcolor=FleetBlue,
+  citecolor=FleetBlue,
+  pdftitle={FleetTax Technical Documentation},
+  pdfauthor={Devansh Singh}
+}
+
+\titleformat{\section}
+  {\Large\bfseries\color{FleetInk}}
+  {\thesection}{0.75em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{FleetBlue}}
+  {\thesubsection}{0.75em}{}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{FleetPaper},
+  rulecolor=\color{FleetInk},
+  keywordstyle=\color{FleetBlue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{FleetRed},
+  tabsize=2,
+  showstringspaces=false
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{FleetTax}
+\rhead{Technical Documentation}
+\lfoot{Version 1.0.0}
+\rfoot{\thepage}
+
+\title{
+  \vspace{-1.4cm}
+  \Huge\textbf{FleetTax}\\[0.25cm]
+  \Large Vahan Road Tax Tracker for Bus and Truck Fleets\\[0.35cm]
+  \normalsize Technical Documentation
+}
+\author{
+  Devansh Singh\\
+  \url{https://github.com/DevanshSrajput/FleetTax}
+}
+\date{Version 1.0.0}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{center}
+\fcolorbox{FleetInk}{FleetYellow}{%
+  \parbox{0.88\textwidth}{%
+    \centering
+    \textbf{Purpose:} FleetTax helps Indian commercial fleet operators track road tax expiry, receive local reminders, open the Vahan portal, and maintain payment records without cloud dependency.
+  }
+}
+\end{center}
+
+\tableofcontents
+\newpage
+
+\section{Product Overview}
+
+FleetTax is an offline-first Android application built with Flutter. It is designed for bus and truck fleet owners who need a reliable way to manage road tax deadlines across multiple vehicles. The app stores data locally, calculates tax validity from the last paid date and selected period, highlights urgent vehicles, and supports direct handoff to the Vahan portal for payment.
+
+\subsection{Primary Users}
+\begin{itemize}[leftmargin=*]
+  \item Fleet owners managing buses, trucks, or mixed commercial fleets.
+  \item Office staff responsible for tax renewal tracking.
+  \item Operators who need a simple device-local record instead of a spreadsheet or cloud system.
+\end{itemize}
+
+\subsection{Core Outcomes}
+\begin{itemize}[leftmargin=*]
+  \item Reduce missed tax renewal dates.
+  \item Keep vehicle status visible at a glance.
+  \item Store payment notes and receipt references with each vehicle.
+  \item Continue working even when internet is unavailable.
+\end{itemize}
+
+\section{Feature Set}
+
+\subsection{Vehicle Management}
+\begin{itemize}[leftmargin=*]
+  \item Add, edit, and delete vehicle records.
+  \item Store registration number, vehicle type, tax period, last paid date, notes, and receipt reference.
+  \item Search vehicles by registration number.
+  \item Filter by vehicle type or tax status.
+\end{itemize}
+
+\subsection{Tax Tracking}
+\begin{itemize}[leftmargin=*]
+  \item Monthly, quarterly, and yearly tax validity periods.
+  \item Automatic expiry calculation from the last payment date.
+  \item Three operational states: expired, due soon, and valid.
+  \item Dashboard statistics for quick daily review.
+\end{itemize}
+
+\subsection{Payment Workflow}
+\begin{enumerate}[leftmargin=*]
+  \item Review vehicles marked expired or due soon.
+  \item Open the Vahan portal from the app.
+  \item Complete the official payment flow.
+  \item Mark the vehicle as paid in FleetTax.
+  \item Save the new period, payment date, and receipt reference.
+\end{enumerate}
+
+\section{Technology Stack}
+
+\begin{longtable}{p{0.24\textwidth} p{0.27\textwidth} p{0.39\textwidth}}
+\toprule
+\textbf{Layer} & \textbf{Technology} & \textbf{Role} \\
+\midrule
+App framework & Flutter 3.x & Cross-platform UI framework targeting Android. \\
+Language & Dart 3.x & Type-safe application logic and async workflows. \\
+State management & Provider 6.x & Reactive app state for vehicle lists, filters, and mutations. \\
+Storage & sqflite / SQLite & Local relational persistence for offline operation. \\
+Notifications & flutter\_local\_notifications & Local alert delivery. \\
+Background work & WorkManager & Periodic checks while the app is closed. \\
+External links & url\_launcher & Opens the Vahan portal in a browser. \\
+\bottomrule
+\end{longtable}
+
+\section{Architecture}
+
+\subsection{Project Structure}
+\begin{lstlisting}
+lib/
+  main.dart
+  models/
+    vehicle.dart
+  db/
+    database_helper.dart
+  providers/
+    vehicle_provider.dart
+  services/
+    notification_service.dart
+    workmanager_service.dart
+  screens/
+    splash_screen.dart
+    dashboard_screen.dart
+    add_edit_screen.dart
+    mark_paid_screen.dart
+  widgets/
+    vehicle_card.dart
+    stats_bar.dart
+    filter_chips.dart
+\end{lstlisting}
+
+\subsection{Responsibility Map}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Vehicle model:} Owns tax period, expiry date, days-left calculation, and status logic.
+  \item \textbf{Database helper:} Encapsulates SQLite database creation and CRUD operations.
+  \item \textbf{Vehicle provider:} Loads records, applies filters/search, and notifies UI listeners.
+  \item \textbf{Notification service:} Initializes local notification channels and dispatches alerts.
+  \item \textbf{WorkManager service:} Schedules periodic background checks.
+  \item \textbf{Screens and widgets:} Present dashboard, forms, payment flow, and reusable UI components.
+\end{itemize}
+
+\section{Data Model}
+
+\begin{longtable}{p{0.18\textwidth} p{0.22\textwidth} p{0.48\textwidth}}
+\toprule
+\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+\midrule
+id & int? & SQLite primary key. \\
+reg & String & Vehicle registration number. \\
+type & String & Vehicle type such as bus or truck. \\
+taxPeriod & String & monthly, quarterly, or yearly. \\
+lastPaid & String & ISO-8601 date used as the calculation base. \\
+notes & String? & Optional operator notes. \\
+receiptRef & String? & Optional payment or receipt reference. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Status Rules}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Expired:} Expiry date is before the current date.
+  \item \textbf{Due soon:} Expiry date is today or within the next 10 days.
+  \item \textbf{Valid:} More than 10 days remain.
+\end{itemize}
+
+\section{Notification Flow}
+
+\begin{enumerate}[leftmargin=*]
+  \item WorkManager starts the periodic background task.
+  \item The task loads all vehicles from SQLite.
+  \item Each vehicle computes expiry date and remaining days.
+  \item Expired and due-soon vehicles are passed to the notification service.
+  \item The notification displays the registration number and urgency.
+\end{enumerate}
+
+\section{Developer Setup}
+
+\subsection{Requirements}
+\begin{itemize}[leftmargin=*]
+  \item Flutter SDK with Dart 3.11.5 or newer.
+  \item Android Studio or compatible Android toolchain.
+  \item Android device or emulator.
+\end{itemize}
+
+\subsection{Run Locally}
+\begin{lstlisting}[language=bash]
+flutter pub get
+flutter analyze
+flutter test
+flutter run
+\end{lstlisting}
+
+\section{Build and Release}
+
+\subsection{Release APK}
+\begin{lstlisting}[language=bash]
+flutter clean
+flutter pub get
+flutter build apk --release
+\end{lstlisting}
+
+The release APK is generated at:
+\begin{lstlisting}
+build/app/outputs/flutter-apk/app-release.apk
+\end{lstlisting}
+
+\subsection{Release Checklist}
+\begin{itemize}[leftmargin=*]
+  \item Run analyzer and tests.
+  \item Verify vehicle CRUD on a real Android device.
+  \item Verify notification permission and reminder behavior.
+  \item Verify Vahan portal launch.
+  \item Attach APK and documentation PDF to the GitHub release.
+\end{itemize}
+
+\section{Troubleshooting}
+
+\subsection{Notifications Do Not Appear}
+Check Android notification permission, app battery restrictions, WorkManager registration, and local notification channel initialization.
+
+\subsection{Database Data Looks Stale}
+Confirm provider reload calls after insert/update/delete operations. During development, uninstalling the app clears the local SQLite database.
+
+\subsection{Vahan Portal Does Not Open}
+Verify that the device has a browser installed and that url\_launcher is configured correctly for Android.
+
+\section{Roadmap}
+
+\begin{itemize}[leftmargin=*]
+  \item Insurance expiry tracking.
+  \item Fitness certificate tracking.
+  \item Optional backup and restore.
+  \item Receipt image or PDF attachment.
+  \item Play Store release.
+\end{itemize}
+
+\section{License}
+
+FleetTax is released under the MIT License. See the repository license file for the complete terms.
+
+\section{Project Links}
+
+\begin{itemize}[leftmargin=*]
+  \item Repository: \url{https://github.com/DevanshSrajput/FleetTax}
+  \item Developer GitHub: \url{https://github.com/DevanshSrajput}
+  \item Portfolio: \url{https://devanshsingh.dev}
+\end{itemize}
+
+\end{document}

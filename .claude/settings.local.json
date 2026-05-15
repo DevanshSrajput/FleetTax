@@ -7,7 +7,12 @@
       "Bash(cp \"FleetTax.png\" \"android\\\\app\\\\src\\\\main\\\\res\\\\mipmap-mdpi\\\\ic_launcher.png\")",
       "Bash(cp \"FleetTax.png\" \"android\\\\app\\\\src\\\\main\\\\res\\\\mipmap-xhdpi\\\\ic_launcher.png\")",
       "Bash(cp \"FleetTax.png\" \"android\\\\app\\\\src\\\\main\\\\res\\\\mipmap-xxhdpi\\\\ic_launcher.png\")",
-      "Bash(cp \"FleetTax.png\" \"android\\\\app\\\\src\\\\main\\\\res\\\\mipmap-xxxhdpi\\\\ic_launcher.png\")"
+      "Bash(cp \"FleetTax.png\" \"android\\\\app\\\\src\\\\main\\\\res\\\\mipmap-xxxhdpi\\\\ic_launcher.png\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'Fix black screen after Mark Paid - Update app name to Fleet Tax' --body ' *)"
     ]
   }
 }
